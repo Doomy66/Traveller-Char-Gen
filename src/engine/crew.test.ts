@@ -112,6 +112,19 @@ describe("a post's narrower skill", () => {
     expect(crewVariant(marine, 0)).toBe(marine);
   }, 60000);
 
+  it("rolls engineers with the Engineer speciality asked for", async () => {
+    const { crewVariant } = await import("../rules/crew");
+    const { skillLevel } = await import("./character");
+    const engineer = findPosition("engineer");
+    for (const [i, spec] of ["j-drive", "m-drive", "power", "life support"].entries()) {
+      const p = crewVariant(engineer, i + 1);
+      expect(p.skills).toEqual([{ skill: "Engineer", spec }]);
+      const m = await rollCrewMember(p, 1, { ...DEFAULT_SETTINGS }, "human", seedsFrom(800 + i));
+      expect(m.met, spec).toBe(true);
+      expect(skillLevel(m.t, "Engineer", spec)).toBeGreaterThanOrEqual(1);
+    }
+  }, 60000);
+
   it("rolls gunners with the Gunner speciality asked for", async () => {
     const { crewVariant } = await import("../rules/crew");
     const { skillLevel } = await import("./character");

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4, 2026-11-15
+
+- Crew: the Engineer post can ask for one Engineer speciality (j-drive,
+  m-drive, power or life support).
+
 ## 0.2.3, 2026-11-15
 
 - Crew: the Gunner post can ask for a Gunner speciality (turret, ortillery,

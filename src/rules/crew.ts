@@ -86,7 +86,8 @@ export const CREW_POSITIONS: CrewPosition[] = [
     salary: 4_000,
     careers: ["navy/engineer-gunner", "merchant/merchant-marine", "scout/courier", "ge-fleet/engineer", "ge-slave/technician"],
     source: "HG p24",
-    note: "Any of j-drive, m-drive or power.",
+    note: "Any of j-drive, m-drive or power, unless you pick one.",
+    options: ["j-drive", "m-drive", "power", "life support"].map((spec) => ({ label: `Engineer (${spec})`, skills: [{ skill: "Engineer", spec }] })),
   },
   {
     id: "maintenance",
