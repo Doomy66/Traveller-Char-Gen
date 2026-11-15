@@ -1,5 +1,5 @@
-import type { Possession, Traveller } from "../engine/character";
-import { ITEMS, type ItemCategory } from "../rules/equipment";
+import { skillLevel, type Possession, type Traveller } from "../engine/character";
+import { ITEMS, itemSkill, type Item, type ItemCategory } from "../rules/equipment";
 import { STARTING_EQUIPMENT_LIMIT } from "../rules/tables";
 import { clear, el, fmtCr } from "./dom";
 
@@ -30,10 +30,20 @@ const CATEGORIES: { id: ItemCategory | "all"; name: string }[] = [
   { id: "other", name: "Options and other" },
 ];
 
+/** The item's skill as text and the Traveller's level in it, if the lists give it one. */
+function skillFor(t: Traveller, i: Item): { text: string; level?: number; ok: boolean } | undefined {
+  const s = itemSkill(i);
+  if (!s) return undefined;
+  const level = skillLevel(t, s.name, s.spec);
+  const text = `${s.name}${s.spec ? ` (${s.spec})` : ""}${s.min ? ` ${s.min}` : ""}`;
+  return { text, ...(level !== undefined ? { level } : {}), ok: level !== undefined && level >= s.min };
+}
+
 export function renderShop(host: HTMLElement, t: Traveller, purchases: Possession[], changed: () => void, maxTL = 12): void {
   let cat: ItemCategory | "all" = "gun";
   let query = "";
   let tl = maxTL;
+  let onlySkilled = false;
   const spent = () => purchases.reduce((a, p) => a + (p.cost ?? 0), 0);
   const list = el("div", { class: "shop-list" });
   const status = el("p", { class: "muted" });
@@ -41,13 +51,14 @@ export function renderShop(host: HTMLElement, t: Traveller, purchases: Possessio
   const draw = () => {
     const allowance = Math.max(0, Math.min(STARTING_EQUIPMENT_LIMIT - spent(), t.cash));
     status.textContent = `Spent ${fmtCr(spent())} of the ${fmtCr(STARTING_EQUIPMENT_LIMIT)} starting allowance. Cash left ${fmtCr(t.cash)}.`;
-    const items = ITEMS.filter((i) => (cat === "all" || i.category === cat) && i.tl <= tl && (!query || i.name.toLowerCase().includes(query))).sort((a, b) => a.cost - b.cost);
+    const items = ITEMS.filter((i) => (cat === "all" || i.category === cat) && i.tl <= tl && (!query || i.name.toLowerCase().includes(query)) && (!onlySkilled || skillFor(t, i)?.ok)).sort((a, b) => a.cost - b.cost);
     clear(list);
-    list.append(
+    if (!items.length) list.append(el("p", { class: "muted" }, onlySkilled ? "Nothing here that uses a skill you have." : "Nothing matches."));
+    else list.append(
       el(
         "table",
         { class: "t" },
-        el("thead", {}, el("tr", {}, el("th", {}, "Item"), el("th", { class: "n" }, "TL"), el("th", { class: "n" }, "Cost"), el("th", {}, ""))),
+        el("thead", {}, el("tr", {}, el("th", {}, "Item"), el("th", {}, "Skill"), el("th", { class: "n" }, "TL"), el("th", { class: "n" }, "Cost"), el("th", {}, ""))),
         el(
           "tbody",
           {},
@@ -56,6 +67,11 @@ export function renderShop(host: HTMLElement, t: Traveller, purchases: Possessio
               "tr",
               {},
               el("td", {}, i.name, i.stats ? el("div", { class: "faint" }, i.stats) : null),
+              (() => {
+                const sk = skillFor(t, i);
+                if (!sk) return el("td", { class: "faint" }, "-");
+                return el("td", { class: sk.ok ? "good" : "faint", title: sk.ok ? `You have ${sk.text.replace(/ \d+$/, "")} ${sk.level}` : sk.level === undefined ? "Untrained" : `You have ${sk.level}` }, sk.text, el("div", { class: "faint" }, sk.level === undefined ? "untrained" : `you: ${sk.level}`));
+              })(),
               el("td", { class: "n" }, i.tl),
               el("td", { class: "n" }, fmtCr(i.cost)),
               el(
@@ -138,6 +154,7 @@ export function renderShop(host: HTMLElement, t: Traveller, purchases: Possessio
         CATEGORIES.map((c) => el("option", { value: c.id, selected: c.id === cat }, c.name)),
       ),
       el("input", { type: "search", placeholder: "Search", oninput: (e: Event) => ((query = (e.target as HTMLInputElement).value.toLowerCase()), draw()) }),
+      el("label", { class: "check muted" }, el("input", { type: "checkbox", onchange: (e: Event) => ((onlySkilled = (e.target as HTMLInputElement).checked), draw()) }), " Only what I have the skill for"),
       el("label", { class: "muted" }, "Max TL ", el("input", { type: "number", min: 0, max: 20, value: String(tl), style: "width:56px", oninput: (e: Event) => ((tl = Number((e.target as HTMLInputElement).value) || 0), draw()) })),
     ),
     list,

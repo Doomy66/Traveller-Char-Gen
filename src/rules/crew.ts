@@ -27,6 +27,14 @@ export interface CrewPosition {
   careers: string[];
   source: string;
   note?: string;
+  /** Narrower skills the user may insist on instead of `skills`, such as one Gun Combat speciality. */
+  options?: { label: string; skills: CrewSkill[] }[];
+}
+
+/** The post with option `i` taken in place of its skills (0, or no such option: the post as it is). */
+export function crewVariant(p: CrewPosition, i: number): CrewPosition {
+  const o = i > 0 ? p.options?.[i - 1] : undefined;
+  return o ? { ...p, skills: o.skills } : p;
 }
 
 export const SALARY_PER_LEVEL_ABOVE_1 = 0.5;
@@ -142,6 +150,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
     salary: 1_000,
     careers: ["marine/star-marine", "marine/ground-assault", "army/infantry", "ge-warrior/imperial-guard", "ge-slave/dog-soldier"],
     source: "CRB p154",
+    options: ["archaic", "energy", "slug"].map((spec) => ({ label: `Gun Combat (${spec})`, skills: [{ skill: "Gun Combat", spec }] })),
   },
 ];
 

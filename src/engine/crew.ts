@@ -116,6 +116,8 @@ export function crewAnswerer(t: Traveller, random: () => number, p: CrewPosition
 
 export interface CrewMember {
   position: string;
+  /** The post as asked for, with any narrower skill chosen. */
+  post: CrewPosition;
   t: Traveller;
   level: number;
   /** The NPC reached the level asked for. */
@@ -137,7 +139,7 @@ export async function rollCrewMember(p: CrewPosition, min: number, settings: Set
   for (let i = 1; i <= tries; i++) {
     const t = await makeNpc(settings, species, nextSeed(), (tt, r) => crewAnswerer(tt, r, p, min));
     const level = crewLevel(t, p);
-    const m: CrewMember = { position: p.id, t, level, met: level >= min, tries: i };
+    const m: CrewMember = { position: p.id, post: p, t, level, met: level >= min, tries: i };
     if (m.met) return m;
     if (!best || level > best.level) best = m;
   }

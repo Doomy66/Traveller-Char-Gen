@@ -43,6 +43,18 @@ export interface Item {
   source: Source; // { book: "CRB", page: printed page }
 }
 
+/**
+ * The skill an item is used with, and the level it needs: a weapon's or
+ * vehicle's skill at 0, or armour's "Requires Vacc Suit N". Undefined for
+ * gear the lists give no skill.
+ */
+export function itemSkill(i: Item): { name: string; spec?: string; min: number } | undefined {
+  const text = i.skill ?? /Requires ([^,]+?) (\d+)(?:,|$)/.exec(i.stats ?? "")?.slice(1, 3).join(" ");
+  if (!text) return undefined;
+  const m = /^(.+?)(?: \((.+)\))?(?: (\d+))?$/.exec(text.trim())!;
+  return { name: m[1]!, ...(m[2] ? { spec: m[2] } : {}), min: m[3] ? Number(m[3]) : 0 };
+}
+
 const crb = (page: number): Source => ({ book: "CRB", page });
 const csc = (page: number): Source => ({ book: "CSC", page });
 

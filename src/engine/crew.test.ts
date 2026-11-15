@@ -95,3 +95,20 @@ describe("NPC specialities", () => {
     for (const name of ["Gun Combat", "Pilot", "Electronics", "Engineer"]) expect(seen.get(name)?.size ?? 0, name).toBeGreaterThanOrEqual(3);
   }, 60000);
 });
+
+describe("a post's narrower skill", () => {
+  it("rolls marines with the Gun Combat speciality asked for", async () => {
+    const { crewVariant } = await import("../rules/crew");
+    const { skillLevel } = await import("./character");
+    const marine = findPosition("marine");
+    for (const [i, spec] of ["archaic", "energy", "slug"].entries()) {
+      const p = crewVariant(marine, i + 1);
+      expect(p.skills).toEqual([{ skill: "Gun Combat", spec }]);
+      const m = await rollCrewMember(p, 1, { ...DEFAULT_SETTINGS }, "human", seedsFrom(500 + i));
+      expect(m.met, spec).toBe(true);
+      expect(skillLevel(m.t, "Gun Combat", spec)).toBeGreaterThanOrEqual(1);
+      expect(m.post).toBe(p);
+    }
+    expect(crewVariant(marine, 0)).toBe(marine);
+  }, 60000);
+});

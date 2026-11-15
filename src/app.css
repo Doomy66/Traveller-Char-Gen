@@ -164,7 +164,7 @@ details.hist summary { cursor: pointer; color: var(--muted); }
 .crowd tbody tr:hover td { background: #20242b; }
 .crowd tbody tr.on td { background: #2a2618; }
 .crew-posts td, .crew-posts th { padding-top: 3px; padding-bottom: 3px; }
-.crew-posts input, .crew-posts select { text-align: right; }
+.crew-posts td.n input, .crew-posts td.n select { text-align: right; }
 .crew td button { padding: 2px 8px; font-size: 12px; }
 
 dialog { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; max-width: min(760px, 92vw); }

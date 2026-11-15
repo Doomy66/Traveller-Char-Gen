@@ -4,7 +4,7 @@ import { crewLevel, otherPosts, rollCrewMember, CREW_TRIES, type CrewMember } fr
 import { newSeed } from "../engine/dice";
 import { careerLine, toCsv, toMarkdown, toText } from "../engine/export";
 import { npcSpecies } from "../engine/npc";
-import { CREW_POSITIONS, CREW_PRESETS, crewSalary, crewSkillText, findPosition, type CrewPosition } from "../rules/crew";
+import { CREW_POSITIONS, CREW_PRESETS, crewSalary, crewSkillText, crewVariant, type CrewPosition } from "../rules/crew";
 import { SPECIES } from "../rules/species";
 import { clear, download, el, fmtCr } from "./dom";
 import { renderSheet } from "./sheet";
@@ -20,6 +20,8 @@ interface CrewRequest {
   species: string;
   counts: Record<string, number>;
   min: Record<string, number>;
+  /** Which of a post's options is insisted on; 0 or missing for the post as it is. */
+  variant?: Record<string, number>;
 }
 
 const STORE = "traveller-char-gen.crew";
@@ -51,7 +53,7 @@ export function leaveCrew(): void {
 
 /** The post's skill as held: "Pilot (spacecraft) 2", or "untrained". */
 function bestSkill(m: CrewMember): string {
-  const p = findPosition(m.position);
+  const p = m.post;
   if (m.level < 0) return `${p.skills.map(crewSkillText).join(" or ")}: untrained`;
   let text = crewSkillText(p.skills[0]!);
   for (const s of p.skills) {
@@ -83,6 +85,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
   const preset = el("select", {}, el("option", { value: "" }, "Choose a Core ship…"), CREW_PRESETS.map((p) => el("option", { value: p.name }, `${p.name} (CRB p${p.page})`)));
   const counts = new Map<string, HTMLInputElement>();
   const mins = new Map<string, HTMLSelectElement>();
+  const variants = new Map<string, HTMLSelectElement>();
   const posts = el(
     "table",
     { class: "t crew-posts" },
@@ -94,12 +97,19 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
         const n = el("input", { type: "number", min: 0, max: 20, value: String(req.counts[p.id] ?? 0), style: "width:56px" });
         const m = el("select", {}, [0, 1, 2, 3, 4].map((lv) => el("option", { value: lv, selected: lv === (req.min[p.id] ?? 1) }, String(lv))));
         counts.set(p.id, n);
+        const skillCell = p.options
+          ? (() => {
+              const v = el("select", { title: "The skill the post needs" }, el("option", { value: 0 }, p.skills.map(crewSkillText).join(" or ")), p.options.map((o, i) => el("option", { value: i + 1, selected: i + 1 === (req.variant?.[p.id] ?? 0) }, o.label)));
+              variants.set(p.id, v);
+              return v;
+            })()
+          : p.skills.map(crewSkillText).join(" or ");
         mins.set(p.id, m);
         return el(
           "tr",
           {},
           el("td", {}, p.name, p.note ? el("div", { class: "faint" }, p.note) : null),
-          el("td", { class: "muted" }, p.skills.map(crewSkillText).join(" or ")),
+          el("td", { class: "muted" }, skillCell),
           el("td", { class: "n" }, fmtCr(p.salary)),
           el("td", { class: "n" }, n),
           el("td", { class: "n" }, m),
@@ -119,8 +129,10 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
   const exportBtn = el("button", { onclick: () => exportCrew() }, "Export");
 
   const read = (): CrewRequest => {
-    const r: CrewRequest = { setting: setting.value as Settings["setting"], species: species.value, counts: {}, min: {} };
+    const r: CrewRequest = { setting: setting.value as Settings["setting"], species: species.value, counts: {}, min: {}, variant: {} };
     for (const p of CREW_POSITIONS) {
+      const v = variants.get(p.id);
+      if (v) r.variant![p.id] = Number(v.value);
       r.counts[p.id] = Math.max(0, Math.min(20, Math.round(Number(counts.get(p.id)!.value) || 0)));
       r.min[p.id] = Number(mins.get(p.id)!.value);
     }
@@ -142,7 +154,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
     clear(results);
     exportBtn.disabled = crew.length === 0;
     if (!crew.length) return;
-    const payroll = crew.reduce((s, m) => s + crewSalary(findPosition(m.position), m.level), 0);
+    const payroll = crew.reduce((s, m) => s + crewSalary(m.post, m.level), 0);
     const short = crew.filter((m) => !m.met).length;
     results.append(
       el("h2", { class: "section" }, "The crew"),
@@ -154,7 +166,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
           "tbody",
           {},
           crew.map((m, i) => {
-            const p = findPosition(m.position);
+            const p = m.post;
             const also = otherPosts(m.t, p.id).map((x) => x.name);
             return el(
               "tr",
@@ -179,7 +191,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
                       const r = read();
                       const g = generation;
                       status.textContent = `Rolling another ${p.name.toLowerCase()}…`;
-                      const fresh = await rollCrewMember(p, r.min[p.id] ?? 1, settingsFor(r), speciesFor(r), seeds);
+                      const fresh = await rollCrewMember(crewVariant(p, r.variant?.[p.id] ?? 0), r.min[p.id] ?? 1, settingsFor(r), speciesFor(r), seeds);
                       if (g !== generation) return;
                       crew[i] = fresh;
                       status.textContent = "";
@@ -203,6 +215,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
     req.setting = r.setting;
     req.species = r.species;
     req.counts = r.counts;
+    req.variant = r.variant;
     req.min = r.min;
     store(r);
     const wanted = CREW_POSITIONS.flatMap((p) => Array.from({ length: r.counts[p.id] ?? 0 }, () => p));
@@ -220,7 +233,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
         status.textContent = `Rolling ${p.name.toLowerCase()} (${i + 1} of ${wanted.length})…`;
         // Let the page draw between posts.
         await new Promise((res) => setTimeout(res, 0));
-        const m = await rollCrewMember(p as CrewPosition, r.min[p.id] ?? 1, settingsFor(r), speciesFor(r), seeds);
+        const m = await rollCrewMember(crewVariant(p as CrewPosition, r.variant?.[p.id] ?? 0), r.min[p.id] ?? 1, settingsFor(r), speciesFor(r), seeds);
         if (g !== generation) return;
         crew.push(m);
         draw();
@@ -246,7 +259,7 @@ export function renderCrew(left: HTMLElement, sheet: HTMLElement): void {
 
 export function exportCrew(): void {
   if (!crew.length) return;
-  const post = (m: CrewMember) => findPosition(m.position);
+  const post = (m: CrewMember) => m.post;
   const list = crew.map((m) => m.t);
   const d = el(
     "dialog",

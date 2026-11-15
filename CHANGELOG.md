@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1, 2026-11-15
+
+- Crew: the Marine post can ask for a Gun Combat speciality (archaic, energy
+  or slug) instead of any Gun Combat or Melee.
+- Starting equipment shows each item's skill and your level in it, and can
+  list only what you have the skill for.
+
 ## 0.2.0, 2026-11-15
 
 - Roll a ship's crew: the count and skill level wanted for each post

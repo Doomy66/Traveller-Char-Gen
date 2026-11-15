@@ -230,6 +230,11 @@ conversation and sheet side by side; the finished screen with the
 Cr10,000 starting equipment shop; quick NPCs and crowds; a rules browser over
 the data.
 
+10.1.1 The shop shows each item's skill (a weapon's or vehicle's skill, or
+armour's "Requires Vacc Suit N") with the Traveller's level in it, and can
+list only the items the Traveller has the skill for. Gear the lists give no
+skill is left out of that list.
+
 10.2 The session saves itself in the browser and can be resumed; a
 `.traveller` file can be saved and opened.
 
@@ -270,7 +275,8 @@ table CRB p182 gives in part): captain, pilot, small craft pilot, astrogator,
 engineer, maintenance, gunner, sensor operator, steward, medic, administrator
 and officer, plus the marine of CRB p154. Each names the skills that fill it
 (any one will do), its monthly salary at skill 1, and the careers and
-assignments that teach it.
+assignments that teach it. A post may offer narrower skills to insist on
+instead: the marine can ask for one Gun Combat speciality.
 
 12.2 **Salary** is the table's figure at level 1, half as much again for each
 level above (HG p23). Below level 1 it is the table's figure.

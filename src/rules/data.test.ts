@@ -4,6 +4,7 @@ import { SPECIALS } from "../engine/effects";
 import { CAREERS } from "./careers/index";
 import { GE_ALT_TABLES } from "./careers/ge";
 import { ITEMS, SHIPS } from "./equipment";
+import { findSkill } from "./skills";
 import { LIFE_EVENTS, PRE_CAREER_EVENTS, SKILL_PACKAGES } from "./tables";
 import type { Effect, TableRow } from "./types";
 
@@ -151,5 +152,21 @@ describe("grammar", () => {
         { k: "skill", name: "Admin", tags: ["female", "slave"] },
       ],
     });
+  });
+});
+
+describe("item skills", () => {
+  it("reads weapon skills and armour requirements", async () => {
+    const { itemSkill } = await import("./equipment");
+    const by = (id: string) => itemSkill(ITEMS.find((i) => i.id === id)!);
+    expect(by("battle-dress-tl13")).toEqual({ name: "Vacc Suit", min: 2 });
+    expect(by("vacc-suit-tl10")).toEqual({ name: "Vacc Suit", min: 0 });
+    expect(by("jack")).toBeUndefined();
+    const gun = ITEMS.find((i) => i.skill === "Gun Combat (slug)")!;
+    expect(itemSkill(gun)).toEqual({ name: "Gun Combat", spec: "slug", min: 0 });
+    for (const i of ITEMS) {
+      const s = itemSkill(i);
+      if (s) expect(findSkill(s.name), `${i.id} ${s.name}`).toBeDefined();
+    }
   });
 });
