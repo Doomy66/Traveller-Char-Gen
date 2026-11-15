@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5, 2026-11-15
+
+- Crew: posts with a speciality choice (Captain, Engineer, Gunner, Marine)
+  can have more than one row, each with its own speciality, count and
+  level. Reroll keeps the speciality and level the NPC was rolled for.
+
 ## 0.2.4, 2026-11-15
 
 - Crew: the Engineer post can ask for one Engineer speciality (j-drive,

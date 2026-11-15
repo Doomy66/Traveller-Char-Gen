@@ -280,7 +280,9 @@ assignments that teach it. A post may offer narrower skills to insist on
 instead: the marine can ask for one Gun Combat speciality, the gunner for
 one Gunner speciality, the engineer for one Engineer speciality (life
 support included, though the post otherwise wants j-drive, m-drive or
-power), and the captain for one of Leadership, Broker or Admin.
+power), and the captain for one of Leadership, Broker or Admin. Such a post
+can take more than one row, each with its own count, option and level, so
+a crew can have, say, one j-drive and one power engineer.
 
 12.2 **Salary** is the table's figure at level 1, half as much again for each
 level above (HG p23). Below level 1 it is the table's figure.
