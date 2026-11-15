@@ -43,11 +43,12 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "captain",
     name: "Captain",
-    skills: [{ skill: "Leadership" }],
+    skills: [{ skill: "Leadership" }, { skill: "Broker" }, { skill: "Admin" }],
     salary: 10_000,
-    careers: ["navy/line-crew", "merchant/free-trader", "merchant/merchant-marine", "ge-fleet-officer/commander", "ge-fleet-officer/shipmaster"],
+    careers: ["navy/line-crew", "merchant/free-trader", "merchant/merchant-marine", "merchant/broker", "ge-fleet-officer/commander", "ge-fleet-officer/shipmaster"],
     source: "HG p24",
-    note: "The book names no skill for a captain; the generator looks for Leadership.",
+    note: "The book names no skill for a captain; any of these will do.",
+    options: ["Leadership", "Broker", "Admin"].map((skill) => ({ label: skill, skills: [{ skill }] })),
   },
   {
     id: "pilot",

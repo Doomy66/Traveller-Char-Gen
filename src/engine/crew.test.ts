@@ -111,4 +111,16 @@ describe("a post's narrower skill", () => {
     }
     expect(crewVariant(marine, 0)).toBe(marine);
   }, 60000);
+
+  it("rolls captains with Leadership, Broker or Admin, or the one asked for", async () => {
+    const { crewVariant } = await import("../rules/crew");
+    const { skillLevel } = await import("./character");
+    const captain = findPosition("captain");
+    expect(captain.skills.map((s) => s.skill)).toEqual(["Leadership", "Broker", "Admin"]);
+    for (const [i, skill] of ["Leadership", "Broker", "Admin"].entries()) {
+      const m = await rollCrewMember(crewVariant(captain, i + 1), 1, { ...DEFAULT_SETTINGS }, "human", seedsFrom(600 + i));
+      expect(m.met, skill).toBe(true);
+      expect(skillLevel(m.t, skill)).toBeGreaterThanOrEqual(1);
+    }
+  }, 60000);
 });

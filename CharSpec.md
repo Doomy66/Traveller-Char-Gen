@@ -266,7 +266,8 @@ Core lists, so Gun and Weapon benefits offer every weapon within the limit.
 mishap that offers it as a choice.
 
 11.8 **A captain's skill.** The Crew Requirements table gives a captain no
-skill. The crew roller looks for Leadership.
+skill. The crew roller takes Leadership, Broker or Admin, or whichever one
+of them the user insists on.
 
 ## 12. Crews
 
@@ -276,7 +277,8 @@ engineer, maintenance, gunner, sensor operator, steward, medic, administrator
 and officer, plus the marine of CRB p154. Each names the skills that fill it
 (any one will do), its monthly salary at skill 1, and the careers and
 assignments that teach it. A post may offer narrower skills to insist on
-instead: the marine can ask for one Gun Combat speciality.
+instead: the marine can ask for one Gun Combat speciality, the captain for
+one of Leadership, Broker or Admin.
 
 12.2 **Salary** is the table's figure at level 1, half as much again for each
 level above (HG p23). Below level 1 it is the table's figure.

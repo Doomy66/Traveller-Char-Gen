@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2, 2026-11-15
+
+- Crew: a captain can be filled by Leadership, Broker or Admin, or you can
+  insist on one of them.
+
 ## 0.2.1, 2026-11-15
 
 - Crew: the Marine post can ask for a Gun Combat speciality (archaic, energy
