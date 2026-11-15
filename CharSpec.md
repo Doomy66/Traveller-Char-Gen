@@ -277,8 +277,8 @@ engineer, maintenance, gunner, sensor operator, steward, medic, administrator
 and officer, plus the marine of CRB p154. Each names the skills that fill it
 (any one will do), its monthly salary at skill 1, and the careers and
 assignments that teach it. A post may offer narrower skills to insist on
-instead: the marine can ask for one Gun Combat speciality, the captain for
-one of Leadership, Broker or Admin.
+instead: the marine can ask for one Gun Combat speciality, the gunner for
+one Gunner speciality, the captain for one of Leadership, Broker or Admin.
 
 12.2 **Salary** is the table's figure at level 1, half as much again for each
 level above (HG p23). Below level 1 it is the table's figure.

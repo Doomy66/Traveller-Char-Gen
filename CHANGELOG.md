@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3, 2026-11-15
+
+- Crew: the Gunner post can ask for a Gunner speciality (turret, ortillery,
+  screen or capital).
+
 ## 0.2.2, 2026-11-15
 
 - Crew: a captain can be filled by Leadership, Broker or Admin, or you can
