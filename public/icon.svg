@@ -1,0 +1,17 @@
+<!-- The `user` glyph is from Tabler Icons by Pawel Kuna, MIT licence.
+     Full text in LICENSE-tabler-icons.txt beside this file. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="52" fill="#14161a" />
+  <rect x="4" y="4" width="248" height="248" rx="48" fill="none" stroke="#2e333c" stroke-width="4" />
+  <g
+    transform="translate(40 40) scale(7.333)"
+    fill="none"
+    stroke="#e0b341"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+  </g>
+</svg>

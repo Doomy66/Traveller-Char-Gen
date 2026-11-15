@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'"
+    />
+    <!-- The icon is the `user` glyph from Tabler Icons by Pawel Kuna, used
+         under the MIT licence, on the same frame PlanetHex gives its own. The
+         licence text ships with the site as /LICENSE-tabler-icons.txt. -->
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <title>Traveller Character Generator</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="at-landing">
+    <div id="landing" class="landing">
+      <div class="sky-stars" aria-hidden="true"></div>
+      <div class="sky-limb" aria-hidden="true"></div>
+      <div class="landing-card">
+        <header>
+          <img class="landing-logo" src="./icon.svg" alt="" width="72" height="72" />
+          <h1>Traveller Generator</h1>
+          <p class="landing-lead">A Traveller to the 2022 Core Rulebook,<br />term by term, the way the book does it.</p>
+          <p class="landing-what">
+            Characteristics, background skills, university and the academies, fourteen careers and their
+            assignments, every event and mishap, commissions and promotion, ageing and anagathics, injuries and
+            medical bills, mustering out, psionics, Aslan and Vargr, and the Glorious Empire. Every die is shown,
+            every choice is yours, and undo goes back one decision.
+          </p>
+        </header>
+        <ul class="levels">
+          <li class="level">
+            <svg class="level-icon" viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><path d="M10 40c1-8 7-12 14-12s13 4 14 12" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><circle cx="36" cy="12" r="2" fill="#e0b341"/></svg>
+            <div class="level-what"><h2>New Traveller</h2><p>Roll one up, making every choice yourself.</p></div>
+            <div class="level-act"><button type="button" class="primary" id="landing-new">New</button></div>
+          </li>
+          <li class="level">
+            <svg class="level-icon" viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="3" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><rect x="26" y="26" width="14" height="14" rx="3" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><circle cx="15" cy="15" r="2" fill="#e0b341"/><circle cx="30" cy="30" r="1.6" fill="#dfe3ea"/><circle cx="36" cy="36" r="1.6" fill="#dfe3ea"/></svg>
+            <div class="level-what"><h2>Quick NPCs</h2><p>Roll one or a crowd at random, with sensible choices made for them.</p></div>
+            <div class="level-act"><button type="button" id="landing-npc">One</button><button type="button" id="landing-batch">A crowd</button></div>
+          </li>
+          <li class="level">
+            <svg class="level-icon" viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><path d="M8 15h12l3 3h17v18H8z" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><path d="M8 20h32" fill="none" stroke="rgba(223,227,234,0.6)" stroke-width="1.3"/></svg>
+            <div class="level-what"><h2>Open</h2><p>A .traveller file you saved, to finish or reprint.</p></div>
+            <div class="level-act"><button type="button" id="landing-open">Open file</button><button type="button" id="landing-resume" hidden>Resume last</button></div>
+          </li>
+          <li class="level">
+            <svg class="level-icon" viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><rect x="10" y="7" width="28" height="34" rx="3" fill="rgba(40,52,74,0.6)" stroke="rgba(150,170,210,0.5)" stroke-width="1.2"/><path d="M15 16h18M15 22h18M15 28h12" stroke="rgba(223,227,234,0.6)" stroke-width="1.3"/></svg>
+            <div class="level-what"><h2>The rules</h2><p>Every career's tables at a glance, as the generator reads them.</p></div>
+            <div class="level-act"><button type="button" id="landing-rules">Browse</button></div>
+          </li>
+        </ul>
+        <div class="landing-foot">
+          <div>
+            <a id="landing-help" href="#" target="_blank" rel="noopener">How it works</a>
+            <a id="landing-notes" href="#" target="_blank" rel="noopener">What's new</a>
+            <span class="faint" id="landing-version"></span>
+          </div>
+          <p>
+            An unofficial fan tool. <i>Traveller</i> is a trade mark of Mongoose Publishing and the rules are their
+            copyright; nothing here reproduces their text. You need your own copy of the Core Rulebook.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <header class="bar">
+      <button type="button" class="bar-home" id="home" title="Back to the start">
+        <span class="brand"><img src="./icon.svg" alt="" /><span class="brand-name">Traveller Generator</span></span>
+      </button>
+      <span class="bar-sub" id="bar-sub"></span>
+      <span class="spacer"></span>
+      <button type="button" id="btn-undo" title="Go back one decision (Ctrl+Z)">Undo</button>
+      <button type="button" id="btn-auto" title="Let the generator make the remaining choices">Finish for me</button>
+      <button type="button" id="btn-save" title="Save as a .traveller file">Save</button>
+      <button type="button" id="btn-export" title="Copy or download the sheet as text">Export</button>
+      <button type="button" id="btn-print" title="Print the sheet">Print</button>
+    </header>
+
+    <main class="layout" id="layout">
+      <section class="panel-form" id="left"></section>
+      <section class="panel-sheet" id="sheet"></section>
+    </main>
+
+    <input type="file" id="file-open" accept=".traveller,.json,application/json" hidden />
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
