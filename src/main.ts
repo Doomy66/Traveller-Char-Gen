@@ -1,14 +1,15 @@
 import "./style.css";
 import "./app.css";
 import { emptyTraveller, upp, type Gender, type Traveller } from "./engine/character";
-import { Ctx, DEFAULT_SETTINGS, randomAnswerer, type Settings } from "./engine/context";
-import { createTraveller } from "./engine/creation";
-import { newSeed, seededRandom } from "./engine/dice";
+import { DEFAULT_SETTINGS, type Settings } from "./engine/context";
+import { newSeed } from "./engine/dice";
+import { makeNpc, npcSpecies } from "./engine/npc";
 import { careerLine, toCsv, toMarkdown, toText } from "./engine/export";
 import { randomName } from "./rules/names";
 import { SPECIES } from "./rules/species";
 import { ScreenAnswerer } from "./ui/ask";
 import { clear, download, el, fmtCr, toast } from "./ui/dom";
+import { exportCrew, leaveCrew, renderCrew } from "./ui/crew";
 import { renderRules } from "./ui/rules";
 import { Session, type SavedTraveller } from "./ui/session";
 import { renderSheet } from "./ui/sheet";
@@ -30,7 +31,7 @@ const SETTINGS_STORE = "traveller-char-gen.settings";
 
 let session: Session | undefined;
 let answerer: ScreenAnswerer | undefined;
-let mode: "setup" | "create" | "done" | "crowd" | "rules" | "npc" = "setup";
+let mode: "setup" | "create" | "done" | "crowd" | "crew" | "rules" | "npc" = "setup";
 
 $("landing-version").textContent = `Version ${APP_VERSION}`;
 ($("landing-help") as HTMLAnchorElement).href = HELP;
@@ -72,18 +73,19 @@ function bar(): void {
   $<HTMLButtonElement>("btn-undo").hidden = !creating;
   $<HTMLButtonElement>("btn-auto").hidden = mode !== "create";
   $<HTMLButtonElement>("btn-save").hidden = !creating && mode !== "npc";
-  $<HTMLButtonElement>("btn-export").hidden = !(creating || mode === "npc" || mode === "crowd");
+  $<HTMLButtonElement>("btn-export").hidden = !(creating || mode === "npc" || mode === "crowd" || mode === "crew");
   $<HTMLButtonElement>("btn-print").hidden = mode === "setup" || mode === "rules";
   $<HTMLButtonElement>("btn-undo").disabled = !session || session.decisions === 0;
   if (session && (mode === "create" || mode === "done")) {
     const t = session.t;
     barSub.textContent = `${t.name || "New Traveller"} · ${upp(t)} · age ${t.age}${mode === "done" ? " · finished" : ""}`;
-  } else barSub.textContent = { setup: "New Traveller", crowd: "A crowd of NPCs", rules: "The rules", npc: "Quick NPC", create: "", done: "" }[mode];
+  } else barSub.textContent = { setup: "New Traveller", crowd: "A crowd of NPCs", crew: "A ship's crew", rules: "The rules", npc: "Quick NPC", create: "", done: "" }[mode];
 }
 
 $("home").addEventListener("click", () => {
   answerer?.cancel();
   if (session?.ctx) session.ctx.aborted = true;
+  leaveCrew();
   show("landing");
   if (recall<SavedTraveller>(STORE)) $("landing-resume").hidden = false;
 });
@@ -286,6 +288,7 @@ $("btn-print").addEventListener("click", () => window.print());
 $("btn-save").addEventListener("click", () => saveFile());
 $("btn-export").addEventListener("click", () => {
   if (mode === "crowd") exportCrowd();
+  else if (mode === "crew") exportCrew();
   else if (session) exportDialog(session.t);
   else if (npc) exportDialog(npc);
 });
@@ -352,12 +355,8 @@ function openSaved(s: SavedTraveller): void {
 // ---------------------------------------------------------------- quick NPC
 
 let npc: Traveller | undefined;
-async function rollNpc(settings: Settings, species: string, seed = newSeed()): Promise<Traveller> {
-  const random = seededRandom(seed);
-  const t: Traveller = { ...emptyTraveller(), speciesId: species, gender: random() < 0.5 ? "female" : "male", name: randomName(random, species) };
-  const ctx = new Ctx(t, { ...settings, manualDice: false }, randomAnswerer(seededRandom(seed ^ 0x5bd1e995)), random);
-  await createTraveller(ctx);
-  return t;
+function rollNpc(settings: Settings, species: string, seed = newSeed()): Promise<Traveller> {
+  return makeNpc(settings, species, seed);
 }
 
 $("landing-npc").addEventListener("click", () => npcScreen());
@@ -437,12 +436,9 @@ function crowdScreen(): void {
   const go = async () => {
     const n = Math.max(1, Math.min(200, Number(count.value) || 12));
     const st: Settings = { ...DEFAULT_SETTINGS, setting: setting.value as Settings["setting"] };
-    const pool = SPECIES.filter((x) => x.settings.includes(st.setting));
     crowd = [];
     for (let i = 0; i < n; i++) {
-      // Mostly human (or Aslan in the Empire), with the odd other.
-      const sp = st.setting === "core" ? (Math.random() < 0.85 ? "human" : pool[1 + Math.floor(Math.random() * (pool.length - 1))]!.id) : Math.random() < 0.7 ? "ge-aslan" : "ge-human-slave";
-      crowd.push(await rollNpc(st, sp));
+      crowd.push(await rollNpc(st, npcSpecies(st.setting)));
     }
     draw();
     if (crowd[0]) renderSheet(sheet, crowd[0], { editable: true });
@@ -476,6 +472,16 @@ function exportCrowd(): void {
   document.body.append(d);
   d.showModal();
 }
+
+// ---------------------------------------------------------------- a crew
+
+$("landing-crew").addEventListener("click", () => {
+  mode = "crew";
+  show("work");
+  session = undefined;
+  bar();
+  renderCrew(left, sheet);
+});
 
 // ---------------------------------------------------------------- rules
 

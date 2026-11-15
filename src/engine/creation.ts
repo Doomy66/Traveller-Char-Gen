@@ -409,8 +409,8 @@ async function educationTerm(ctx: Ctx, plan: TermPlan): Promise<void> {
     }
     startTerm(ctx, "University");
     const opts = UNIVERSITY.skills.map((s) => ({ label: s, value: s }));
-    const lv1 = await ctx.one("University: choose a skill at level 1", opts, { hint: 0, always: true });
-    const lv0 = await ctx.one("University: choose a second skill at level 0", opts.filter((o) => o.value !== lv1), { hint: 1, always: true });
+    const lv1 = await ctx.one("University: choose a skill at level 1", opts, { always: true });
+    const lv0 = await ctx.one("University: choose a second skill at level 0", opts.filter((o) => o.value !== lv1), { always: true });
     await applyGain(ctx, env, parseGain(`${lv1} 1`));
     await applyGain(ctx, env, parseGain(`${lv0} 0`));
     await applyGain(ctx, env, parseGain("EDU +1"));
@@ -924,7 +924,7 @@ async function finish(ctx: Ctx): Promise<void> {
         ...SKILL_PACKAGES.map((p) => ({ label: p.name, value: p.id, detail: `${p.text} ${p.skills.map((s) => `${s} 1`).join(", ")}` })),
         { label: "No package", value: "" },
       ],
-      { hint: 0, always: true },
+      { always: true },
     );
     if (pkg) {
       const p = SKILL_PACKAGES.find((x) => x.id === pkg)!;

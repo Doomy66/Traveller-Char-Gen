@@ -36,6 +36,11 @@ of writing, this is 100% Claude generated to my exacting requirements.
   Ships come with their quirks and mortgages.
 - **Starting equipment**: spend up to Cr10,000 from a list of three hundred
   items.
+- **A ship's crew**: say how many pilots, astrogators, engineers, gunners,
+  stewards, medics and the rest you need, and the skill level, or start from
+  any Core ship's crew line. Each post gets an NPC rolled by the ordinary
+  rules, steered towards the careers that teach the job, with salary and the
+  month's payroll.
 - **The sheet** redrawn after every roll, printable, and exported as text or
   Markdown. NPC crowds export as CSV.
 - **A rules browser** showing every table as the generator reads it.
@@ -57,7 +62,9 @@ npm run dev
 
 `npm test` runs the suite, which includes rolling several hundred Travellers
 of every species to the end. `npm run build` typechecks and bundles.
-`npx vite-node scripts/sample.ts 7` prints one random Traveller's history.
+`npx vite-node scripts/sample.ts 7` prints one random Traveller's history;
+`npx vite-node scripts/crew-stats.ts 100 core 1` shows how often a steered NPC
+reaches each crew post's skill.
 
 ## What it is not
 

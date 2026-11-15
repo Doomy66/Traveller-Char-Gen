@@ -2,7 +2,8 @@
 
 The contract for the generator. Code and tests cite these clauses. Page
 numbers are printed pages. CRB is the *Traveller Core Rulebook Update 2022*,
-GE is *Glorious Empire*, CSC the *Central Supply Catalogue Update 2023*.
+GE is *Glorious Empire*, CSC the *Central Supply Catalogue Update 2023*, HG
+*High Guard Update 2022*.
 
 ## Contents
 
@@ -17,6 +18,7 @@ GE is *Glorious Empire*, CSC the *Central Supply Catalogue Update 2023*.
 9. Output
 10. The application
 11. Rulings and open questions
+12. Crews
 
 ## 1. Purpose
 
@@ -257,3 +259,35 @@ Core lists, so Gun and Weapon benefits offer every weapon within the limit.
 
 11.7 **Death.** Core creation has no death. The only death is the Dog Soldier
 mishap that offers it as a choice.
+
+11.8 **A captain's skill.** The Crew Requirements table gives a captain no
+skill. The crew roller looks for Leadership.
+
+## 12. Crews
+
+12.1 **Posts.** `src/rules/crew.ts` holds the crew posts of HG pp23-24 (the
+table CRB p182 gives in part): captain, pilot, small craft pilot, astrogator,
+engineer, maintenance, gunner, sensor operator, steward, medic, administrator
+and officer, plus the marine of CRB p154. Each names the skills that fill it
+(any one will do), its monthly salary at skill 1, and the careers and
+assignments that teach it.
+
+12.2 **Salary** is the table's figure at level 1, half as much again for each
+level above (HG p23). Below level 1 it is the table's figure.
+
+12.3 **Starting points.** The crew line of each Core ship (CRB pp190-216) can
+be loaded as the counts.
+
+12.4 **Filling a post.** An NPC is rolled by the ordinary rules (8) with an
+answerer that makes the choices someone after the job would make: the
+careers and assignments listed for the post, the skill tables and
+specialities that hold its skill, staying in a career until the skill is at
+the level asked for, then leaving after two to four terms, and never serving
+more than seven. The dice are never touched. The first NPC at the level fills
+the post; after 40 tries the best of them does, marked as short.
+
+12.5 **Output.** The crew table shows each post's NPC, their level in the
+post's skill, salary, careers and the other posts they could fill at level 1,
+with the month's payroll. Any one post can be rerolled. CSV, Markdown and
+text exports carry the post, skill and salary with each sheet.
+

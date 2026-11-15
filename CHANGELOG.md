@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0, 2026-11-15
+
+- Roll a ship's crew: the count and skill level wanted for each post
+  (High Guard's crew table and the marine), or a Core ship's crew line to
+  start from. Each post gets an NPC who can do the job, with salary,
+  payroll, reroll and CSV, Markdown and text export.
+- NPCs no longer always take the first speciality (Gun Combat was always
+  archaic), the first two university skills, the first skills package or the
+  dearest benefit item.
+
 ## 0.1.0, 2026-11-15
 
 First version.

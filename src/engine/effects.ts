@@ -197,7 +197,8 @@ async function pickSpec(ctx: Ctx, name: string, g: { spec?: string; specChoices?
     ...(held[s] !== undefined ? { detail: `now ${held[s]}` } : {}),
   }));
   // Suggest raising the speciality already highest, as most players would.
-  let hint = 0;
+  // With none held there is no suggestion, so an NPC picks one at random.
+  let hint: number | undefined;
   let bestHeld = -1;
   list.forEach((s, i) => {
     if ((held[s] ?? -1) > bestHeld && (held[s] ?? -1) < 4) {
@@ -205,7 +206,7 @@ async function pickSpec(ctx: Ctx, name: string, g: { spec?: string; specChoices?
       hint = i;
     }
   });
-  return ctx.one(`Which speciality of ${name}?`, opts, { hint });
+  return ctx.one(`Which speciality of ${name}?`, opts, hint !== undefined ? { hint } : {});
 }
 
 function reportSkill(ctx: Ctx, env: Env | undefined, name: string, spec: string | undefined, r: SkillChange): void {

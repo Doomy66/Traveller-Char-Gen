@@ -114,15 +114,15 @@ export function toMarkdown(t: Traveller, withHistory = true): string {
 }
 
 /** One CSV row per Traveller, for a crowd of NPCs. */
-export function toCsv(list: Traveller[]): string {
+export function toCsv(list: Traveller[], lead?: { headers: string[]; cells: (t: Traveller, i: number) => string[] }): string {
   const esc = (s: string) => (/[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
-  const rows = [["Name", "Species", "Age", "UPP", "Careers", "Skills", "Cash", "Ship Shares"].join(",")];
-  for (const t of list) {
+  const rows = [[...(lead?.headers ?? []), "Name", "Species", "Age", "UPP", "Careers", "Skills", "Cash", "Ship Shares"].join(",")];
+  list.forEach((t, i) => {
     rows.push(
-      [t.name, findSpecies(t.speciesId).name, String(t.age), upp(t), t.careers.map(careerLine).join("; "), skillList(t).map((s) => `${s.name} ${s.level}`).join(", "), String(t.cash), String(t.shipShares)]
+      [...(lead?.cells(t, i) ?? []), t.name, findSpecies(t.speciesId).name, String(t.age), upp(t), t.careers.map(careerLine).join("; "), skillList(t).map((s) => `${s.name} ${s.level}`).join(", "), String(t.cash), String(t.shipShares)]
         .map(esc)
         .join(","),
     );
-  }
+  });
   return rows.join("\n");
 }

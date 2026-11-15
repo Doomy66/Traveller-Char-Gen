@@ -319,7 +319,7 @@ export async function pickItem(ctx: Ctx, benefit: string, filter: (i: Item) => b
     ...items.map((i) => ({ label: `${i.name} (TL${i.tl}, ${fmt(i.cost)})`, value: i as Item | null, ...(i.stats ? { detail: i.stats } : {}) })),
     { label: "Choose later (note it on the sheet)", value: null as Item | null },
   ];
-  const pick = await ctx.one(`${benefit}: choose one`, options, { hint: 0, always: true });
+  const pick = await ctx.one(`${benefit}: choose one`, options, { always: true });
   if (pick) {
     ctx.t.possessions.push({
       name: pick.name,
