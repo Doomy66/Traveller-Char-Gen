@@ -20,6 +20,8 @@ export interface SavedTraveller {
   post: { name: string; goal: string; notes: string; purchases: Possession[] };
   /** The finished Traveller, for readers that do not replay. */
   traveller?: Traveller;
+  /** A character brought in from another tool: `traveller` is all there is, with no transcript to replay. */
+  imported?: { from: string; warnings?: string[] };
 }
 
 export class Session {

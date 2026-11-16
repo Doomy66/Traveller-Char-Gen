@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, type Settings } from "./engine/context";
 import { newSeed } from "./engine/dice";
 import { makeNpc, npcSpecies } from "./engine/npc";
 import { careerLine, toCsv, toMarkdown, toText } from "./engine/export";
+import { fromFoundry, isFoundryActor } from "./engine/foundry";
 import { randomName } from "./rules/names";
 import { SPECIES } from "./rules/species";
 import { ScreenAnswerer } from "./ui/ask";
@@ -31,7 +32,7 @@ const SETTINGS_STORE = "traveller-char-gen.settings";
 
 let session: Session | undefined;
 let answerer: ScreenAnswerer | undefined;
-let mode: "setup" | "create" | "done" | "crowd" | "crew" | "rules" | "npc" = "setup";
+let mode: "setup" | "create" | "done" | "crowd" | "crew" | "rules" | "npc" | "imported" = "setup";
 
 $("landing-version").textContent = `Version ${APP_VERSION}`;
 ($("landing-help") as HTMLAnchorElement).href = HELP;
@@ -72,14 +73,16 @@ function bar(): void {
   const creating = mode === "create" || mode === "done";
   $<HTMLButtonElement>("btn-undo").hidden = !creating;
   $<HTMLButtonElement>("btn-auto").hidden = mode !== "create";
-  $<HTMLButtonElement>("btn-save").hidden = !creating && mode !== "npc";
-  $<HTMLButtonElement>("btn-export").hidden = !(creating || mode === "npc" || mode === "crowd" || mode === "crew");
+  $<HTMLButtonElement>("btn-save").hidden = !creating && mode !== "npc" && mode !== "imported";
+  $<HTMLButtonElement>("btn-export").hidden = !(creating || mode === "npc" || mode === "crowd" || mode === "crew" || mode === "imported");
   $<HTMLButtonElement>("btn-print").hidden = mode === "setup" || mode === "rules";
   $<HTMLButtonElement>("btn-undo").disabled = !session || session.decisions === 0;
   if (session && (mode === "create" || mode === "done")) {
     const t = session.t;
     barSub.textContent = `${t.name || "New Traveller"} · ${upp(t)} · age ${t.age}${mode === "done" ? " · finished" : ""}`;
-  } else barSub.textContent = { setup: "New Traveller", crowd: "A crowd of NPCs", crew: "A ship's crew", rules: "The rules", npc: "Quick NPC", create: "", done: "" }[mode];
+  } else if (mode === "imported" && imported) {
+    barSub.textContent = `${imported.t.name || "Imported Traveller"} · ${upp(imported.t)} · age ${imported.t.age} · imported`;
+  } else barSub.textContent = { setup: "New Traveller", crowd: "A crowd of NPCs", crew: "A ship's crew", rules: "The rules", npc: "Quick NPC", create: "", done: "", imported: "" }[mode];
 }
 
 $("home").addEventListener("click", () => {
@@ -289,6 +292,7 @@ $("btn-save").addEventListener("click", () => saveFile());
 $("btn-export").addEventListener("click", () => {
   if (mode === "crowd") exportCrowd();
   else if (mode === "crew") exportCrew();
+  else if (mode === "imported" && imported) exportDialog(imported.t);
   else if (session) exportDialog(session.t);
   else if (npc) exportDialog(npc);
 });
@@ -300,6 +304,21 @@ function fileName(t: Traveller, ext: string): string {
 function saveFile(): void {
   if (mode === "npc" && npc) {
     download(fileName(npc, "md"), toMarkdown(npc), "text/markdown");
+    return;
+  }
+  if (mode === "imported" && imported) {
+    const saved: SavedTraveller = {
+      format: "traveller-char-gen",
+      version: 1,
+      setup: emptyTraveller(),
+      settings: { ...DEFAULT_SETTINGS },
+      transcript: [],
+      post: { name: imported.t.name, goal: imported.t.goal, notes: imported.t.notes, purchases: [] },
+      traveller: imported.t,
+      imported: { from: imported.from, warnings: imported.warnings },
+    };
+    download(fileName(imported.t, "traveller"), JSON.stringify(saved, null, 1), "application/json");
+    toast("Saved");
     return;
   }
   if (!session) return;
@@ -338,7 +357,11 @@ $("file-open").addEventListener("change", async (e) => {
   (e.target as HTMLInputElement).value = "";
   if (!f) return;
   try {
-    openSaved(JSON.parse(await f.text()) as SavedTraveller);
+    const data: unknown = JSON.parse(await f.text());
+    if (isFoundryActor(data)) {
+      const { t, warnings } = fromFoundry(data);
+      importedScreen({ t, warnings, from: "Foundry VTT (Mongoose Traveller 2e)" });
+    } else openSaved(data as SavedTraveller);
   } catch (err) {
     alert(`That file could not be opened: ${String(err)}`);
   }
@@ -348,8 +371,48 @@ $("landing-resume").addEventListener("click", () => {
   if (s) openSaved(s);
 });
 function openSaved(s: SavedTraveller): void {
+  if (s.imported && s.traveller) {
+    importedScreen({ t: s.traveller, warnings: s.imported.warnings ?? [], from: s.imported.from });
+    return;
+  }
   session = Session.load(s);
   startCreation(false, s.transcript);
+}
+
+// ---------------------------------------------------------------- imported
+
+/** A character brought in from elsewhere: a finished sheet with no transcript, so no undo. CharSpec 13. */
+let imported: { t: Traveller; warnings: string[]; from: string } | undefined;
+function importedScreen(x: { t: Traveller; warnings: string[]; from: string }): void {
+  answerer?.cancel();
+  if (session?.ctx) session.ctx.aborted = true;
+  session = undefined;
+  imported = x;
+  mode = "imported";
+  show("work");
+  clear(left);
+  const t = x.t;
+  const draw = () => renderSheet(sheet, t, { editable: true, onEdit: () => bar() });
+  left.append(
+    el(
+      "div",
+      { class: "ask done" },
+      el("h3", {}, `${t.name || "This Traveller"}, imported`),
+      el("p", { class: "detail" }, `From ${x.from}. The file holds the finished character, not how they were made, so there is nothing to undo or replay. Check the sheet, then save it here as a .traveller file.`),
+      x.warnings.length ? el("ul", { class: "warn-list" }, x.warnings.map((w) => el("li", { class: "warn" }, w))) : null,
+      el(
+        "div",
+        { class: "foot" },
+        el("button", { class: "primary", onclick: () => saveFile() }, "Save"),
+        el("button", { onclick: () => exportDialog(t) }, "Export"),
+        el("button", { onclick: () => window.print() }, "Print"),
+      ),
+    ),
+    el("h2", { class: "section" }, "From the file"),
+    historyList(t),
+  );
+  draw();
+  bar();
 }
 
 // ---------------------------------------------------------------- quick NPC

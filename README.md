@@ -6,7 +6,9 @@ and undo one decision at a time. It also rolls NPCs, one or a crowd, with
 the choices made for them.
 
 It runs in the browser, keeps nothing on a server and sends nothing anywhere.
-A Traveller saves as a `.traveller` file on your own machine.
+A Traveller saves as a `.traveller` file on your own machine, and a
+character exported from Foundry VTT's Mongoose Traveller 2e system can be
+opened too.
 
 ## Claude
 
@@ -48,6 +50,8 @@ of writing, this is 100% Claude generated to my exacting requirements.
 - **The sheet** redrawn after every roll, printable, and exported as text or
   Markdown. NPC crowds export as CSV.
 - **A rules browser** showing every table as the generator reads it.
+- **Foundry VTT import**: open a character exported from Foundry's Mongoose
+  Traveller 2e system and get a finished sheet to print, export or save.
 
 ## Where the numbers come from
 

@@ -19,6 +19,7 @@ GE is *Glorious Empire*, CSC the *Central Supply Catalogue Update 2023*, HG
 10. The application
 11. Rulings and open questions
 12. Crews
+13. Importing from Foundry VTT
 
 ## 1. Purpose
 
@@ -365,3 +366,37 @@ be opened on the crew screen: its crew comes from the same engine, so it
 matches the designer's sheet exactly. Its crew roles map one to one onto the
 posts; it has no marines, scientists or small craft crews of its own.
 
+## 13. Importing from Foundry VTT
+
+13.1 **What is read.** Open file accepts a character exported from Foundry
+VTT's Mongoose Traveller 2e system (system id `mgt2e`; right-click an actor,
+Export Data): a `traveller` or `npc` actor, bare or wrapped as `[actor]` or
+`{actor}`, with `system` (or the older `data`). The layout followed is the
+system's own `template.json` and actor code (Samuel Penn, MIT licence).
+
+13.2 **A finished sheet.** The file holds the character, not how they were
+made, so it opens on its own screen with no transcript: nothing to undo,
+replay or finish. The sheet is editable, and Save writes a `.traveller` file
+with the character in `traveller` and an `imported` marker, which opens back
+on the same screen.
+
+13.3 **Mapping.**
+- Characteristics: each one's `value` (`current` is after damage). PSI only
+  when above 0 or shown.
+- Skills: only those with `trained` set (files from elsewhere that leave the
+  flag out count a level of 0 or more). A skill's level is its `value`; with
+  specialities, each speciality above 0 is held at its `value` and the skill
+  at 0. Ids are matched to our names with spacing and case ignored, and the
+  system's spellings `vetinary` and `linquistics` are corrected. A skill we
+  do not have is kept under its label and listed.
+- Careers: the `term` items in order. The career is the longest career name
+  found in the term's text, the assignment any of its assignment names, and
+  a rank title in brackets at the end sets the rank and whether it is an
+  officer's. Consecutive terms in one career make one record. A career we do
+  not know is kept under the name written.
+- Associates: `associate` items, by relationship; gear: `item`, `weapon`,
+  `armour`, `augment`, `software` and `cargo` items not destroyed, with TL,
+  damage, range, protection, the weapon's skill and the cost.
+- Species: matched by name; otherwise Aslan or Vargr if named, else human,
+  with the original written in the notes. Cash, pension, medical debt and
+  ship shares from `finance`; the biography into the notes.

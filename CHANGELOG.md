@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0, 2026-11-16
+
+- Open a character exported from Foundry VTT's Mongoose Traveller 2e system
+  (right-click the actor, Export Data). It comes in as a finished sheet:
+  characteristics, trained skills and specialities, careers rebuilt from its
+  term records, associates, gear, cash and debts. Anything that could not be
+  matched is listed. Save it here as a `.traveller` file to keep it.
+
 ## 0.3.1, 2026-11-16
 
 - Career choices show each career's chance of qualifying, and careers you

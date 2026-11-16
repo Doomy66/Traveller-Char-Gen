@@ -206,3 +206,6 @@ dialog pre { white-space: pre-wrap; font-size: 12px; max-height: 60vh; overflow:
   background-clip: text;
   color: transparent;
 }
+
+/* Imported character: what could not be brought across. */
+.warn-list { margin: 8px 0; padding-left: 18px; font-size: 13px; }
