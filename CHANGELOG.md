@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.3.0, 2026-11-16
+
+- Crew for a military or service ship: a Service choice (Navy, Marines,
+  Scout Service, Army, Merchant; Aslan Fleet and Warriors in the Glorious
+  Empire). Every member is serving in it, and the crew table, CSV, Markdown
+  and text show their rank. Marines on a Navy ship come from the Marines;
+  captains and officers are commissioned.
+- Each crew row can ask for a lowest rank in the service, such as a Navy
+  captain of O4 Commander or better.
+- Mustering-out weapons (and armour) show the skill they use and your level,
+  list what you can use first, and suggest one of those, so NPCs get a
+  weapon they have the skill for.
+- Crew: Tactics (naval) also fills the Captain post, or can be insisted on.
+- Crew: new posts from the High Guard ship sheets: Scientist, Small craft
+  crew, and Pilot/Astrogator, Astrogator/Engineer and Captain/Pilot for one
+  person doing two jobs.
+- Crew: start from any of the 40 ships the Traveller Ship Designer comes
+  with, or open a `.ship` file saved by it; the crew comes from the
+  designer's own engine.
+- Service crews: earlier careers are fine, but once in the service nothing
+  else follows. Leaving it, even thrown out by a mishap, ends creation; the
+  only move allowed is on to another of the service's careers, such as Fleet
+  to Fleet Officer. They also leave once the job and rank are theirs, so they
+  average about 28 rather than 35.
+- The crew roller is opened from Quick NPCs ("Ship's crew") rather than its
+  own card on the home screen.
+- Crew screen: every visit starts afresh instead of restoring the last
+  choices; choosing a Core ship starts its rows afresh, changing the
+  service resets the ranks asked for, and Start afresh clears everything.
+
 ## 0.2.5, 2026-11-15
 
 - Crew: posts with a speciality choice (Captain, Engineer, Gunner, Marine)

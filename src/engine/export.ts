@@ -22,6 +22,13 @@ export function careerLine(r: CareerRecord): string {
   return `${c.name} (${asg}), ${r.terms} term${r.terms === 1 ? "" : "s"}, rank ${rank}${title ? ` ${title}` : ""}`;
 }
 
+/** A career's rank as a short label: "O3 Lieutenant Commander", "rank 2". */
+export function rankText(r: CareerRecord): string {
+  const title = hasCareer(r.careerId) ? rankTitle(findCareer(r.careerId), r) : undefined;
+  const rank = `${r.officer ? "O" : ""}${r.rank}`;
+  return title ? `${rank} ${title}` : `rank ${rank}`;
+}
+
 export function nobleTitle(t: Traveller): string | undefined {
   const soc = t.stats.SOC ?? 0;
   if (soc < 11 || t.speciesId.includes("aslan")) return undefined;

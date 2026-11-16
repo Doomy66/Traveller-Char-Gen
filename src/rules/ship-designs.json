@@ -1,0 +1,517 @@
+{
+ "designer": "0.1.0",
+ "ships": [
+  {
+   "name": "Rampart Light Fighter",
+   "tons": 10,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Snub",
+   "tons": 20,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Snub 2",
+   "tons": 20,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Ship's Boat",
+   "tons": 30,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Pinnace",
+   "tons": 40,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Wasp Heavy Fighter",
+   "tons": 40,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Kia Heavy Fighter",
+   "tons": 50,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Modular Cutter",
+   "tons": 50,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Roam Pod",
+   "tons": 50,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1
+   }
+  },
+  {
+   "name": "Express Boat",
+   "tons": 100,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 1
+   }
+  },
+  {
+   "name": "Scout/Courier",
+   "tons": 100,
+   "military": false,
+   "group": "High Guard 2022",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 1
+   }
+  },
+  {
+   "name": "Seeker Mining Ship",
+   "tons": 100,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 1,
+    "gunner": 1
+   }
+  },
+  {
+   "name": "Far Trader",
+   "tons": 200,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 1,
+    "gunner": 1,
+    "steward": 1
+   }
+  },
+  {
+   "name": "Free Trader",
+   "tons": 200,
+   "military": false,
+   "group": "High Guard 2022",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 1,
+    "steward": 1
+   }
+  },
+  {
+   "name": "Safari Ship",
+   "tons": 200,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 1,
+    "gunner": 1,
+    "steward": 1
+   }
+  },
+  {
+   "name": "Yacht",
+   "tons": 200,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 1,
+    "steward": 1
+   }
+  },
+  {
+   "name": "Flare Gunboat",
+   "tons": 300,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 3,
+    "astrogator": 1,
+    "engineer": 1,
+    "gunner": 6,
+    "officer": 1
+   }
+  },
+  {
+   "name": "FOO3",
+   "tons": 300,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 2,
+    "gunner": 1
+   }
+  },
+  {
+   "name": "Corsair",
+   "tons": 400,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 2,
+    "gunner": 4
+   }
+  },
+  {
+   "name": "Donosev Survey Scout",
+   "tons": 400,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 1
+   }
+  },
+  {
+   "name": "Dragon System Defence Boat",
+   "tons": 400,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 3,
+    "engineer": 2,
+    "gunner": 5,
+    "officer": 1
+   }
+  },
+  {
+   "name": "Gazelle Close Escort",
+   "tons": 400,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 4,
+    "astrogator": 1,
+    "engineer": 4,
+    "gunner": 8,
+    "officer": 1
+   }
+  },
+  {
+   "name": "Laboratory Ship",
+   "tons": 400,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 1
+   }
+  },
+  {
+   "name": "Patrol Corvette",
+   "tons": 400,
+   "military": false,
+   "group": "High Guard 2022",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 2,
+    "gunner": 4
+   }
+  },
+  {
+   "name": "Subsidised Merchant",
+   "tons": 400,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 1,
+    "gunner": 2,
+    "steward": 2
+   }
+  },
+  {
+   "name": "Subsidised Liner",
+   "tons": 600,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 2,
+    "astrogator": 1,
+    "engineer": 2,
+    "steward": 3
+   }
+  },
+  {
+   "name": "Broadsword Mercenary Cruiser",
+   "tons": 800,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 5,
+    "astrogator": 1,
+    "engineer": 4,
+    "maintenance": 1,
+    "gunner": 16,
+    "officer": 2
+   }
+  },
+  {
+   "name": "Mercenary Cruiser",
+   "tons": 800,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 3,
+    "astrogator": 1,
+    "engineer": 4,
+    "gunner": 4
+   }
+  },
+  {
+   "name": "Destroyer Escort",
+   "tons": 1000,
+   "military": true,
+   "group": "High Guard 2022",
+   "counts": {
+    "captain": 1,
+    "pilot": 4,
+    "astrogator": 1,
+    "engineer": 7,
+    "maintenance": 2,
+    "gunner": 20,
+    "administrator": 1,
+    "officer": 3
+   }
+  },
+  {
+   "name": "Hyperion Escort Carrier",
+   "tons": 1000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 14,
+    "astrogator": 1,
+    "engineer": 2,
+    "maintenance": 2,
+    "gunner": 20,
+    "administrator": 1,
+    "officer": 4
+   }
+  },
+  {
+   "name": "Kinunir Battle Cruiser",
+   "tons": 1250,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 4,
+    "astrogator": 1,
+    "engineer": 6,
+    "maintenance": 2,
+    "gunner": 26,
+    "administrator": 1,
+    "officer": 4
+   }
+  },
+  {
+   "name": "Leviathan Merchant Cruiser",
+   "tons": 1800,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 5,
+    "astrogator": 1,
+    "engineer": 8,
+    "maintenance": 1,
+    "gunner": 10,
+    "officer": 1
+   }
+  },
+  {
+   "name": "Maul-class Bombardment Ship",
+   "tons": 2000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 3,
+    "astrogator": 1,
+    "engineer": 8,
+    "maintenance": 4,
+    "gunner": 26,
+    "administrator": 2,
+    "officer": 4
+   }
+  },
+  {
+   "name": "Musuna Frigate",
+   "tons": 2000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 3,
+    "astrogator": 1,
+    "engineer": 7,
+    "maintenance": 4,
+    "gunner": 22,
+    "administrator": 2,
+    "officer": 4
+   }
+  },
+  {
+   "name": "Hydrogen Fleet Tanker",
+   "tons": 4000,
+   "military": false,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "pilot": 1,
+    "astrogator": 1,
+    "engineer": 8,
+    "maintenance": 4,
+    "gunner": 40,
+    "administrator": 2,
+    "officer": 2
+   }
+  },
+  {
+   "name": "Tern-class Fighter Carrier",
+   "tons": 5000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 28,
+    "astrogator": 1,
+    "engineer": 25,
+    "maintenance": 10,
+    "gunner": 20,
+    "administrator": 5,
+    "officer": 9
+   }
+  },
+  {
+   "name": "Shibash Light Cruiser",
+   "tons": 10000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 6,
+    "astrogator": 1,
+    "engineer": 33,
+    "maintenance": 15,
+    "gunner": 42,
+    "administrator": 8,
+    "sensor-operator": 3,
+    "officer": 10
+   }
+  },
+  {
+   "name": "Gionetti Light Cruiser",
+   "tons": 30000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 8,
+    "astrogator": 1,
+    "engineer": 123,
+    "maintenance": 41,
+    "gunner": 355,
+    "administrator": 21,
+    "sensor-operator": 9,
+    "medic": 4,
+    "officer": 55
+   }
+  },
+  {
+   "name": "Arakoine Strike Cruiser",
+   "tons": 50000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 103,
+    "astrogator": 1,
+    "engineer": 106,
+    "maintenance": 50,
+    "gunner": 114,
+    "administrator": 25,
+    "sensor-operator": 9,
+    "medic": 3,
+    "officer": 40
+   }
+  },
+  {
+   "name": "Azhanti High Lightning Frigate",
+   "tons": 60000,
+   "military": true,
+   "group": "Ship Designer catalogue",
+   "counts": {
+    "captain": 1,
+    "pilot": 67,
+    "astrogator": 1,
+    "engineer": 153,
+    "maintenance": 60,
+    "gunner": 406,
+    "administrator": 30,
+    "sensor-operator": 12,
+    "medic": 6,
+    "officer": 73
+   }
+  }
+ ]
+}

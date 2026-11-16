@@ -1,3 +1,8 @@
+import { findCareer, hasCareer } from "./careers/index";
+import { findSkill } from "./skills";
+
+const SCIENCES = findSkill("Science")!.specialities ?? [];
+
 /**
  * Ship's crew positions, for rolling a crew. CharSpec 12.
  *
@@ -29,6 +34,13 @@ export interface CrewPosition {
   note?: string;
   /** Narrower skills the user may insist on instead of `skills`, such as one Gun Combat speciality. */
   options?: { label: string; skills: CrewSkill[] }[];
+  /** For one person doing two jobs: further skills, any one of each group, also needed at the level. */
+  also?: CrewSkill[][];
+}
+
+/** Every group of skills a post needs: its own, and any `also`. */
+export function skillGroups(p: CrewPosition): CrewSkill[][] {
+  return [p.skills, ...(p.also ?? [])];
 }
 
 /** The post with option `i` taken in place of its skills (0, or no such option: the post as it is). */
@@ -43,12 +55,12 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "captain",
     name: "Captain",
-    skills: [{ skill: "Leadership" }, { skill: "Broker" }, { skill: "Admin" }],
+    skills: [{ skill: "Leadership" }, { skill: "Tactics", spec: "naval" }, { skill: "Broker" }, { skill: "Admin" }],
     salary: 10_000,
     careers: ["navy/line-crew", "merchant/free-trader", "merchant/merchant-marine", "merchant/broker", "ge-fleet-officer/commander", "ge-fleet-officer/shipmaster"],
     source: "HG p24",
     note: "The book names no skill for a captain; any of these will do.",
-    options: ["Leadership", "Broker", "Admin"].map((skill) => ({ label: skill, skills: [{ skill }] })),
+    options: [{ skill: "Leadership" }, { skill: "Tactics", spec: "naval" }, { skill: "Broker" }, { skill: "Admin" }].map((s) => ({ label: crewSkillText(s), skills: [s] })),
   },
   {
     id: "pilot",
@@ -155,6 +167,65 @@ export const CREW_POSITIONS: CrewPosition[] = [
     source: "CRB p154",
     options: ["archaic", "energy", "slug"].map((spec) => ({ label: `Gun Combat (${spec})`, skills: [{ skill: "Gun Combat", spec }] })),
   },
+  {
+    id: "scientist",
+    name: "Scientist",
+    skills: [{ skill: "Science" }],
+    salary: 0,
+    careers: ["scholar/scientist", "scholar/field-researcher", "scout/surveyor"],
+    source: "HG p61",
+    note: "On a laboratory ship. The crew table gives no salary.",
+    options: SCIENCES.map((spec) => ({ label: `Science (${spec})`, skills: [{ skill: "Science", spec }] })),
+  },
+  {
+    id: "small-craft-crew",
+    name: "Small craft crew",
+    skills: [
+      { skill: "Pilot", spec: "small craft" },
+      { skill: "Gunner", spec: "turret" },
+    ],
+    salary: 0,
+    careers: ["navy/flight", "navy/engineer-gunner", "ge-fleet/pilot", "ge-fleet/gunner"],
+    source: "HG ship sheets",
+    note: "Crews for the small craft and fighters a ship carries. The crew table gives no salary.",
+  },
+  // One person doing two jobs, as on some High Guard ships: both skills at the level, the higher salary.
+  {
+    id: "pilot-astrogator",
+    name: "Pilot/Astrogator",
+    skills: [{ skill: "Pilot", spec: "spacecraft" }],
+    also: [[{ skill: "Astrogation" }]],
+    salary: 6_000,
+    careers: ["scout/courier", "navy/flight", "merchant/free-trader"],
+    source: "HG ship sheets",
+    note: "One person, both jobs.",
+  },
+  {
+    id: "astrogator-engineer",
+    name: "Astrogator/Engineer",
+    skills: [{ skill: "Astrogation" }],
+    also: [
+      [
+        { skill: "Engineer", spec: "j-drive" },
+        { skill: "Engineer", spec: "m-drive" },
+        { skill: "Engineer", spec: "power" },
+      ],
+    ],
+    salary: 5_000,
+    careers: ["scout/courier", "scout/explorer", "merchant/free-trader"],
+    source: "HG ship sheets",
+    note: "One person, both jobs.",
+  },
+  {
+    id: "captain-pilot",
+    name: "Captain/Pilot",
+    skills: [{ skill: "Leadership" }, { skill: "Tactics", spec: "naval" }, { skill: "Broker" }, { skill: "Admin" }],
+    also: [[{ skill: "Pilot", spec: "spacecraft" }]],
+    salary: 10_000,
+    careers: ["navy/flight", "scout/courier", "merchant/free-trader"],
+    source: "HG ship sheets",
+    note: "One person, both jobs.",
+  },
 ];
 
 export function findPosition(id: string): CrewPosition {
@@ -171,6 +242,70 @@ export function crewSalary(p: CrewPosition, level: number): number {
 /** The text a position's skill appears as in tables: "Pilot (spacecraft)" or "Admin". */
 export function crewSkillText(s: CrewSkill): string {
   return s.spec ? `${s.skill} (${s.spec})` : s.skill;
+}
+
+/**
+ * A service whose ships the crew serves on: every member must be serving in
+ * it when creation ends, so has its rank. CharSpec 12.6.
+ */
+export interface CrewService {
+  id: string;
+  name: string;
+  setting: "core" | "glorious-empire";
+  /** The careers that count as the service. */
+  careers: string[];
+  /** The service's own troops fill the Marine post, if they are another career, and what they are called. */
+  marines?: string[];
+  marinesName?: string;
+  /** Captains and officers come from these careers, if the service has separate officer careers. */
+  officers?: string[];
+  /** Who serves, when the crew's species is left mixed: the Aslan services take no human slaves. */
+  species?: string[];
+}
+
+export const CREW_SERVICES: CrewService[] = [
+  { id: "navy", name: "Navy", setting: "core", careers: ["navy"], marines: ["marine"], marinesName: "Marines" },
+  { id: "marine", name: "Marines", setting: "core", careers: ["marine"] },
+  { id: "scout", name: "Scout Service", setting: "core", careers: ["scout"] },
+  { id: "army", name: "Army", setting: "core", careers: ["army"] },
+  { id: "merchant", name: "Merchant", setting: "core", careers: ["merchant"] },
+  { id: "ge-fleet", name: "Aslan Fleet", setting: "glorious-empire", careers: ["ge-fleet", "ge-fleet-officer"], marines: ["ge-warrior", "ge-warrior-officer"], marinesName: "Aslan Warriors", officers: ["ge-fleet-officer"], species: ["ge-aslan"] },
+  { id: "ge-warrior", name: "Aslan Warriors", setting: "glorious-empire", careers: ["ge-warrior", "ge-warrior-officer"], officers: ["ge-warrior-officer"], species: ["ge-aslan"] },
+];
+
+/** Posts a service fills with commissioned officers. */
+export const OFFICER_POSTS = ["captain", "officer", "captain-pilot"];
+
+export interface ServiceNeed {
+  service: string;
+  /** Careers that count for this post. */
+  careers: string[];
+  /** The post needs a commission (in a career that has them). */
+  commissioned: boolean;
+  /** The lowest rank that will do, on the post's own ladder: an officer rank where a commission is needed, else an enlisted rank. */
+  minRank: number;
+}
+
+/** What serving in `s` means for post `p`: which careers count, whether a commission is needed, and the lowest rank. */
+export function serviceNeed(s: CrewService, p: CrewPosition, minRank = 0): ServiceNeed {
+  if (p.id === "marine" && s.marines) return { service: s.marinesName ?? s.name, careers: s.marines, commissioned: false, minRank };
+  if (OFFICER_POSTS.includes(p.id)) return s.officers ? { service: s.name, careers: s.officers, commissioned: false, minRank } : { service: s.name, careers: s.careers, commissioned: true, minRank };
+  return { service: s.name, careers: s.careers, commissioned: false, minRank };
+}
+
+/** Labels for ranks 0 to 6 in the need's first career: "O3 Lieutenant", "2 Corporal". Rank 0 is "any". */
+export function rankLabels(need: ServiceNeed): string[] {
+  const c = hasCareer(need.careers[0]!) ? findCareer(need.careers[0]!) : undefined;
+  const table = c?.ranks.find((rt) => !!rt.officer === need.commissioned) ?? c?.ranks[0];
+  return [0, 1, 2, 3, 4, 5, 6].map((i) => {
+    if (i === 0) return "any";
+    const title = table?.ranks[i]?.title;
+    return `${need.commissioned ? "O" : ""}${i}${title ? ` ${title}` : ""}`;
+  });
+}
+
+export function findService(id: string): CrewService | undefined {
+  return CREW_SERVICES.find((x) => x.id === id);
 }
 
 /** The crew line of each Core ship (CRB pp190-216), to start from. Counts by position id. */

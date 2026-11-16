@@ -1,5 +1,5 @@
 import { findCareer } from "../rules/careers/index";
-import { ITEMS, SHIPS, type Item, type ItemCategory } from "../rules/equipment";
+import { ITEMS, SHIPS, itemSkill, type Item, type ItemCategory } from "../rules/equipment";
 import {
   BENEFIT_LIMITS,
   HIGH_RANK_BENEFIT_DM,
@@ -10,7 +10,7 @@ import {
   SHIP_QUIRKS,
 } from "../rules/tables";
 import type { Career } from "../rules/types";
-import { skillLevel, type CareerRecord } from "./character";
+import { skillLevel, type CareerRecord, type Traveller } from "./character";
 import type { Ctx } from "./context";
 import { applyGain, changeStat, gainSkill, newTermState, type Env } from "./effects";
 import { describeGain, parseBenefit, type Gain } from "./grammar";
@@ -312,14 +312,47 @@ async function weaponSkill(ctx: Ctx): Promise<{ name: string; spec?: string } | 
   return m[2] ? { name: m[1]!, spec: m[2] } : { name: m[1]! };
 }
 
-/** Choose an item from the equipment lists within a benefit's limits, or leave it for later. */
+/**
+ * The Traveller's level in the skill an item is used with: undefined if the
+ * item needs none, -1 if untrained or below the level it requires.
+ */
+export function itemSkillLevel(t: Traveller, i: Item): number | undefined {
+  const s = itemSkill(i);
+  if (!s) return undefined;
+  const lv = skillLevel(t, s.name, s.spec);
+  return lv === undefined || lv < s.min ? -1 : lv;
+}
+
+/**
+ * Choose an item from the equipment lists within a benefit's limits, or
+ * leave it for later. Items the Traveller has the skill for come first, best
+ * skill first, and the suggestion is one of them, so a gunslinger gets a gun
+ * and not a sword. CharSpec 7.3.
+ */
 export async function pickItem(ctx: Ctx, benefit: string, filter: (i: Item) => boolean): Promise<void> {
-  const items = ITEMS.filter(filter).sort((a, b) => b.cost - a.cost);
+  const t = ctx.t;
+  const rated = ITEMS.filter(filter).map((i) => ({ i, lv: itemSkillLevel(t, i) }));
+  // Usable first (by skill level, gear needing none counting as 0), then the rest; dearest first within each.
+  const rank = (x: { lv: number | undefined }) => (x.lv === undefined ? 0 : x.lv);
+  rated.sort((a, b) => rank(b) - rank(a) || b.i.cost - a.i.cost);
+  const skillNote = (x: { i: Item; lv: number | undefined }): string => {
+    const s = itemSkill(x.i);
+    if (!s) return "";
+    const name = `${s.name}${s.spec ? ` (${s.spec})` : ""}`;
+    return x.lv === -1 ? `${name}${s.min ? ` ${s.min}` : ""}: you are untrained` : `${name}: you have ${x.lv}`;
+  };
   const options = [
-    ...items.map((i) => ({ label: `${i.name} (TL${i.tl}, ${fmt(i.cost)})`, value: i as Item | null, ...(i.stats ? { detail: i.stats } : {}) })),
+    ...rated.map((x) => {
+      const detail = [x.i.stats, skillNote(x)].filter(Boolean).join(" · ");
+      return { label: `${x.i.name} (${/\bTL\d/.test(x.i.name) ? "" : `TL${x.i.tl}, `}${fmt(x.i.cost)})`, value: x.i as Item | null, ...(detail ? { detail } : {}) };
+    }),
     { label: "Choose later (note it on the sheet)", value: null as Item | null },
   ];
-  const pick = await ctx.one(`${benefit}: choose one`, options, { always: true });
+  // Suggest among the items with the best skill the Traveller holds, varied by name so NPCs differ.
+  const best = rated.length ? rank(rated[0]!) : -1;
+  const top = rated.map((x, n) => ({ x, n })).filter(({ x }) => x.lv !== -1 && rank(x) === best);
+  const hint = top.length ? top[hashOf(`${t.name}/${benefit}/${t.possessions.length}`) % top.length]!.n : undefined;
+  const pick = await ctx.one(`${benefit}: choose one`, options, { always: true, ...(hint !== undefined ? { hint } : {}) });
   if (pick) {
     ctx.t.possessions.push({
       name: pick.name,
@@ -364,4 +397,10 @@ async function shipBenefit(ctx: Ctx, id: string, alt: string | undefined, column
   for (let i = 0; i < n; i++) quirks.push(await rollQuirk(ctx, column));
   t.ships.push({ shipId: s.id, name: s.name, paidPercent: SHIP_MORTGAGE_STEP, quirks });
   ctx.log(`A ${s.name} with 25% of the mortgage paid, and ${n} quirk${n === 1 ? "" : "s"}.`, "benefit");
+}
+
+function hashOf(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
 }

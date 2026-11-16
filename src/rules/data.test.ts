@@ -170,3 +170,12 @@ describe("item skills", () => {
     }
   });
 });
+
+describe("crew services", () => {
+  it("name real careers in their own setting", async () => {
+    const { CREW_SERVICES } = await import("./crew");
+    const { findCareer } = await import("./careers/index");
+    for (const s of CREW_SERVICES)
+      for (const id of [...s.careers, ...(s.marines ?? []), ...(s.officers ?? [])]) expect(findCareer(id).setting, `${s.id} ${id}`).toBe(s.setting);
+  });
+});

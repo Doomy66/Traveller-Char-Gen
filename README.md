@@ -40,7 +40,11 @@ of writing, this is 100% Claude generated to my exacting requirements.
   stewards, medics and the rest you need, and the skill level, or start from
   any Core ship's crew line. Each post gets an NPC rolled by the ordinary
   rules, steered towards the careers that teach the job, with salary and the
-  month's payroll.
+  month's payroll. For a Navy, Scout, Army, Marine or merchant line ship,
+  pick the service and every member is serving in it, with their rank.
+  Start from a Core ship, any ship in the
+  [Traveller Ship Designer](https://github.com/Doomy66/Traveller-Ship-Design),
+  or a `.ship` file saved by it.
 - **The sheet** redrawn after every roll, printable, and exported as text or
   Markdown. NPC crowds export as CSV.
 - **A rules browser** showing every table as the generator reads it.
@@ -64,7 +68,8 @@ npm run dev
 of every species to the end. `npm run build` typechecks and bundles.
 `npx vite-node scripts/sample.ts 7` prints one random Traveller's history;
 `npx vite-node scripts/crew-stats.ts 100 core 1` shows how often a steered NPC
-reaches each crew post's skill.
+reaches each crew post's skill, and `scripts/crew-service-stats.ts navy` how
+many NPCs it takes to fill each post in a service.
 
 ## What it is not
 

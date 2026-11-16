@@ -168,7 +168,10 @@ the Glorious Empire once per career outside Slave (GE p57). Gambler 1+ is
 DM+1 on Cash. Event DMs to one roll are spent when the player chooses.
 
 7.3 Item benefits are chosen from the equipment lists within the book's
-limits (CRB p47), or left to choose later. A repeated benefit gives the
+limits (CRB p47), or left to choose later. Each item shows the skill it is
+used with and the Traveller's level in it; items the Traveller has the
+skill for are listed first, best skill first, and the suggestion (which an
+NPC takes) is one of them. A repeated benefit gives the
 book's alternative (another item or a skill level; armour trade-up; 25% more
 of a ship's mortgage; TAS twice is 2 Ship Shares; a second Scout Ship rolls
 again). A ship comes with 1D quirks (CRB p188).
@@ -266,8 +269,10 @@ Core lists, so Gun and Weapon benefits offer every weapon within the limit.
 mishap that offers it as a choice.
 
 11.8 **A captain's skill.** The Crew Requirements table gives a captain no
-skill. The crew roller takes Leadership, Broker or Admin, or whichever one
-of them the user insists on.
+skill. The crew roller takes Leadership, Tactics (naval), Broker or Admin,
+or whichever one of them the user insists on. Tactics (naval) is the
+speciality for commanding a ship in battle (CRB p72); Tactics (military)
+is for ground forces, so it does not count.
 
 ## 12. Crews
 
@@ -280,15 +285,24 @@ assignments that teach it. A post may offer narrower skills to insist on
 instead: the marine can ask for one Gun Combat speciality, the gunner for
 one Gunner speciality, the engineer for one Engineer speciality (life
 support included, though the post otherwise wants j-drive, m-drive or
-power), and the captain for one of Leadership, Broker or Admin. Such a post
+power), and the captain for one of Leadership, Tactics (naval), Broker or Admin. Such a post
 can take more than one row, each with its own count, option and level, so
 a crew can have, say, one j-drive and one power engineer.
 
 12.2 **Salary** is the table's figure at level 1, half as much again for each
 level above (HG p23). Below level 1 it is the table's figure.
 
-12.3 **Starting points.** The crew line of each Core ship (CRB pp190-216) can
-be loaded as the counts.
+12.1.1 **Posts from the High Guard ship sheets.** Scientist (Science, on a
+laboratory ship, HG p61), Small craft crew (Pilot (small craft) or Gunner
+(turret), for the craft and fighters a ship carries), and three posts for
+one person doing two jobs: Pilot/Astrogator, Astrogator/Engineer and
+Captain/Pilot. A two-job post needs both skills at the level asked for and
+pays the higher of the two salaries. The crew table gives Scientist and
+Small craft crew no salary, shown as a dash.
+
+12.3 **Starting points.** The crew line of each Core ship (CRB pp190-216), or
+any ship the Traveller Ship Designer comes with (12.8), can be loaded as the
+counts.
 
 12.4 **Filling a post.** An NPC is rolled by the ordinary rules (8) with an
 answerer that makes the choices someone after the job would make: the
@@ -298,8 +312,49 @@ the level asked for, then leaving after two to four terms, and never serving
 more than seven. The dice are never touched. The first NPC at the level fills
 the post; after 40 tries the best of them does, marked as short.
 
+12.4.1 Each visit to the crew screen starts afresh (a Free Trader's crew,
+any skill, level 1, no service); nothing is remembered between visits.
+
 12.5 **Output.** The crew table shows each post's NPC, their level in the
 post's skill, salary, careers and the other posts they could fill at level 1,
 with the month's payroll. Any one post can be rerolled. CSV, Markdown and
 text exports carry the post, skill and salary with each sheet.
+
+12.6 **A service's crew.** A crew may be for one service: the Navy, Marines,
+Scout Service, Army or Merchant, or in the Glorious Empire the Aslan Fleet
+or Aslan Warriors. Every member must then end creation serving in it (their
+last career is the service's), so holds its rank, which the crew table
+shows. On a Navy or Fleet ship the Marine post comes from the Marines or
+the Warriors. Captains and officers must be commissioned, or in the
+Glorious Empire come from the Fleet Officer or Warrior Officer career. The
+answerer steers into the service and keeps the NPC in it until the skill
+and rank are there; serving matters more than skill level when the best of
+40 NPCs has to be settled for.
+
+12.6.1 **Once in, that's it.** A service crew member may have had careers
+before joining, but once in the service nothing else follows: leaving it,
+by choice or thrown out by a mishap, ends creation, with no return. The one
+move allowed is on to another of the service's own careers not yet served
+in, such as Aslan Fleet to Fleet Officer; an NPC who has any other career
+after joining (a failed move, a forced term) is unfit and another is rolled.
+A service crew member leaves creation one to three terms in (others two to
+four) once the job and rank are theirs, and one who only qualified by
+serving all seven terms is held back while up to ten more NPCs are tried,
+the youngest qualified being taken. Navy crews average about 28 rather than
+35. With the species left mixed, a service crew is drawn from those who
+can serve: the Aslan services take Aslan only, not human slaves.
+
+12.7 **A minimum rank.** Each row may ask for a lowest rank in the service,
+on the post's own ladder: officer ranks (O1 to O6) for commissioned posts,
+enlisted ranks for the rest, so an enlisted post asking for a rank is not
+filled by an officer. The ranks are labelled with the service's own titles.
+
+12.8 **Ships from the Traveller Ship Designer.** The designer's own engine
+(its sheet() and its .ship reader) is bundled into `src/vendor` by
+`scripts/vendor-ship-designer.mjs`, which also writes the crew of every ship
+the designer comes with (its four High Guard fixtures and its catalogue)
+into `src/rules/ship-designs.json`. A `.ship` file saved by the designer can
+be opened on the crew screen: its crew comes from the same engine, so it
+matches the designer's sheet exactly. Its crew roles map one to one onto the
+posts; it has no marines, scientists or small craft crews of its own.
 
