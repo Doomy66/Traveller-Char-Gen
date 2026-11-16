@@ -28,6 +28,7 @@ import {
   applyEffects,
   applyGain,
   check,
+  checkModifier,
   gainSkill,
   mishap,
   newTermState,
@@ -237,12 +238,43 @@ function qualifyDM(ctx: Ctx, career: Career, assignment?: string): number {
   return d;
 }
 
+/** Whether a check could ever pass: a 12 on 2D plus the best DM reaches the target (no natural success). */
+function canEverPass(ctx: Ctx, text: string, dm: number): boolean {
+  return parseCheck(text).some((op) => 12 + checkModifier(ctx.t, op) + dm >= op.target);
+}
+
+/** Why the Traveller cannot qualify for a career whatever they roll, or undefined if they can. */
+export function cannotQualify(ctx: Ctx, career: Career): string | undefined {
+  const t = ctx.t;
+  const q = career.qualification;
+  const asgs = assignmentsFor(ctx, career);
+  if (asgs.length === 0) return "No assignment is open to you";
+  if (q.automaticIf && stat(t, q.automaticIf.stat) >= q.automaticIf.min) return undefined;
+  const open = asgs.filter((a) => (a.qualification ?? q.check) === null);
+  if (open.length > 0) return undefined;
+  if (t.ageingCrisis) return "Every qualification fails after your ageing crisis";
+  const possible = asgs.some((a) => canEverPass(ctx, (a.qualification ?? q.check)!, qualifyDM(ctx, career, a.id)));
+  return possible ? undefined : `Even a 12 cannot make ${q.check}${qualifyDM(ctx, career) ? ` DM${sign(qualifyDM(ctx, career))}` : ""}`;
+}
+
 function qualifyText(ctx: Ctx, career: Career): string {
   const q = career.qualification;
   if (q.check === null) return "automatic";
   if (q.automaticIf && stat(ctx.t, q.automaticIf.stat) >= q.automaticIf.min) return "automatic";
   const d = qualifyDM(ctx, career);
-  return `${q.check}${d ? ` DM${sign(d)}` : ""}`;
+  return `${q.check}${d ? ` DM${sign(d)}` : ""} (${chanceOf(ctx, q.check, d)}%)`;
+}
+
+/** The chance, in whole per cent, that 2D plus the best DM makes a check. */
+function chanceOf(ctx: Ctx, text: string, dm: number): number {
+  let best = 0;
+  for (const op of parseCheck(text)) {
+    const need = op.target - checkModifier(ctx.t, op) - dm;
+    let ways = 0;
+    for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) if (a + b >= need) ways++;
+    best = Math.max(best, ways);
+  }
+  return Math.round((best / 36) * 100);
 }
 
 /** Pick what to do with the next term. */
@@ -272,15 +304,19 @@ async function chooseNext(ctx: Ctx, lastLeft: string | undefined, mustCareer = f
       continue;
     }
     const auto = t.education?.kind === "academy" && t.education.career === c.id && !t.education.autoEntryUsed && (t.education.graduated || t.education.autoEntryOnFail);
+    const cannot = auto ? undefined : cannotQualify(ctx, c);
     opts.push({
       label: c.name,
       value: { kind: "career", career: c.id, via: auto ? "automatic" : "qualified" },
       detail: `${c.description} Qualify: ${auto ? "automatic (academy)" : t.ageingCrisis && c.qualification.check ? "fails (ageing crisis)" : qualifyText(ctx, c)}.`,
+      ...(cannot ? { disabled: cannot } : {}),
     });
   }
   if (core && !restricted && !t.drafted && ctx.settings.setting === "core") {
     opts.push({ label: "Submit to the draft", value: { kind: "career", career: "draft" }, detail: "1D: Navy, Army, Marines, Merchant Marine, Scouts or Agent (law enforcement). Once in a lifetime." });
   }
+  // Never leave nothing to choose: if every option is out of reach, offer them all and let the dice say no.
+  if (!opts.some((o) => !o.disabled)) for (const o of opts) if (o.disabled && o.disabled !== "Left it last term") delete o.disabled;
   // A suggestion for automatic answers: a career the Traveller is suited to, varied by name and term.
   const suited = opts.map((o, i) => ({ o, i })).filter(({ o }) => !o.disabled && o.value.kind === "career" && o.value.career !== "draft" && hintCareer(ctx, o.value.career!));
   const hint = suited.length > 0 ? suited[hashOf(`${t.name}/${t.terms}/${t.careers.length}`) % suited.length]!.i : -1;
@@ -347,7 +383,10 @@ async function qualifyFailed(ctx: Ctx, career: Career, retryDM: number): Promise
     if (retryDM === 0) {
       const opts = availableCareers(ctx).filter((c) => c.id !== career.id && c.qualification.check !== null);
       const pick = await ctx.one("Qualification failed. Try one more career at DM-1, or become a Landless One?", [
-        ...opts.map((c) => ({ label: c.name, value: c.id, detail: `Qualify ${c.qualification.check} DM-1` })),
+        ...opts.map((c) => {
+          const out = assignmentsFor(ctx, c).every((a) => !canEverPass(ctx, (a.qualification ?? c.qualification.check)!, qualifyDM(ctx, c, a.id) + GE_RULES.qualifyFailRetryDM));
+          return { label: c.name, value: c.id, detail: `Qualify ${c.qualification.check} DM-1`, ...(out ? { disabled: "Even a 12 cannot make it at DM-1" } : {}) };
+        }),
         { label: "Landless One (SOC 0)", value: "ge-landless-one" },
       ], { always: true });
       if (pick !== "ge-landless-one") return qualifyFor(ctx, pick, GE_RULES.qualifyFailRetryDM);

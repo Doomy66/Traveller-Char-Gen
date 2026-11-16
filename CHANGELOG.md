@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1, 2026-11-16
+
+- Career choices show each career's chance of qualifying, and careers you
+  could not qualify for whatever you rolled (too many earlier careers, age,
+  an ageing crisis) are shown but cannot be chosen.
+
 ## 0.3.0, 2026-11-16
 
 - Crew for a military or service ship: a Service choice (Navy, Marines,

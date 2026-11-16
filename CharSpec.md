@@ -197,6 +197,13 @@ first career's first term when the setting says so, CRB p18); survival (twice
 on anagathics, natural 2 fails); mishap or event; commission or advancement;
 the term's benefit roll; four years; ageing from the fourth term.
 
+8.3.1 **Career choices.** Each career offered shows its qualification check,
+DM and chance of success. A career no roll could qualify for (a 12 plus
+the best DM still short of the target, every assignment closed, or any
+check after an ageing crisis) is shown but cannot be chosen, with the
+reason. If that would leave nothing to choose, everything is offered and
+the dice decide.
+
 8.4 Advancement: success raises rank, gives the rank bonus and an extra skill
 roll. A total no greater than terms served in the career ends it; a natural
 12 forces the Traveller to stay. A Prisoner leaves when the advancement total

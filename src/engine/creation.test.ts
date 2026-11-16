@@ -61,3 +61,22 @@ describe("creation", () => {
     for (const id of ["agent", "army", "citizen", "drifter", "entertainer", "marine", "merchant", "navy", "rogue", "scholar", "scout"]) expect(seen, id).toContain(id);
   }, 120000);
 });
+
+describe("career choices", () => {
+  it("disable careers no roll could qualify for", async () => {
+    const { cannotQualify } = await import("./creation");
+    const { findCareer } = await import("../rules/careers/index");
+    const { emptyTraveller } = await import("./character");
+    const t = { ...emptyTraveller(), name: "Q", stats: { STR: 7, DEX: 7, END: 7, INT: 7, EDU: 7, SOC: 2 } };
+    const ctx = new Ctx(t, DEFAULT_SETTINGS, randomAnswerer(seededRandom(1)), seededRandom(2));
+    const noble = findCareer("noble");
+    // SOC 2 is DM-2: a 12 makes 10, just enough for SOC 10+.
+    expect(cannotQualify(ctx, noble)).toBeUndefined();
+    // Three earlier careers at DM-1 each put it out of reach.
+    for (const id of ["army", "navy", "scout"]) t.careers.push({ careerId: id, assignmentId: "", assignments: [], terms: 1, rank: 0, officer: false, highestRank: 0, benefitRolls: 0, benefitDMs: [], ended: true } as never);
+    expect(cannotQualify(ctx, noble)).toMatch(/Even a 12/);
+    expect(cannotQualify(ctx, findCareer("drifter"))).toBeUndefined();
+    t.ageingCrisis = true;
+    expect(cannotQualify(ctx, findCareer("navy"))).toMatch(/ageing crisis/);
+  });
+});
