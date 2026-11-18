@@ -1,5 +1,6 @@
 import { findCareer, hasCareer } from "./careers/index";
 import { findSkill } from "./skills";
+import type { Stat } from "./types";
 
 const SCIENCES = findSkill("Science")!.specialities ?? [];
 
@@ -36,6 +37,12 @@ export interface CrewPosition {
   options?: { label: string; skills: CrewSkill[] }[];
   /** For one person doing two jobs: further skills, any one of each group, also needed at the level. */
   also?: CrewSkill[][];
+  /**
+   * The characteristics the post's work leans on, the most important first. An NPC rolled for
+   * the post puts their best characteristic rolls there, the rest at random (crewAnswerer), as
+   * a player making a character for the job would.
+   */
+  stats?: Stat[];
 }
 
 /** Every group of skills a post needs: its own, and any `also`. */
@@ -55,6 +62,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "captain",
     name: "Captain",
+    stats: ["SOC", "INT"],
     skills: [{ skill: "Leadership" }, { skill: "Tactics", spec: "naval" }, { skill: "Broker" }, { skill: "Admin" }],
     salary: 10_000,
     careers: ["navy/line-crew", "merchant/free-trader", "merchant/merchant-marine", "merchant/broker", "ge-fleet-officer/commander", "ge-fleet-officer/shipmaster"],
@@ -65,6 +73,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "pilot",
     name: "Pilot",
+    stats: ["DEX"],
     skills: [{ skill: "Pilot", spec: "spacecraft" }],
     salary: 6_000,
     careers: ["navy/flight", "scout/courier", "merchant/free-trader", "ge-fleet/pilot"],
@@ -73,6 +82,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "small-craft-pilot",
     name: "Small craft pilot",
+    stats: ["DEX"],
     skills: [{ skill: "Pilot", spec: "small craft" }],
     salary: 6_000,
     careers: ["navy/flight", "scout/surveyor", "marine/star-marine", "ge-fleet/pilot"],
@@ -82,6 +92,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "astrogator",
     name: "Astrogator",
+    stats: ["EDU", "INT"],
     skills: [{ skill: "Astrogation" }],
     salary: 5_000,
     careers: ["scout/courier", "scout/explorer", "navy/flight", "merchant/free-trader", "ge-fleet-officer/navigator"],
@@ -90,6 +101,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "engineer",
     name: "Engineer",
+    stats: ["EDU", "INT"],
     skills: [
       { skill: "Engineer", spec: "j-drive" },
       { skill: "Engineer", spec: "m-drive" },
@@ -104,6 +116,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "maintenance",
     name: "Maintenance",
+    stats: ["EDU"],
     skills: [{ skill: "Mechanic" }],
     salary: 1_000,
     careers: ["navy/engineer-gunner", "merchant/merchant-marine", "army/support", "ge-slave/technician", "ge-fleet/crew"],
@@ -112,6 +125,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "gunner",
     name: "Gunner",
+    stats: ["DEX"],
     skills: [{ skill: "Gunner" }],
     salary: 2_000,
     careers: ["navy/engineer-gunner", "ge-fleet/gunner", "marine/star-marine", "rogue/pirate"],
@@ -121,6 +135,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "sensor-operator",
     name: "Sensor operator",
+    stats: ["INT", "EDU"],
     skills: [{ skill: "Electronics", spec: "sensors" }],
     salary: 4_000,
     careers: ["navy/line-crew", "scout/surveyor", "ge-fleet/crew", "agent/intelligence"],
@@ -129,6 +144,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "steward",
     name: "Steward",
+    stats: ["SOC", "EDU"],
     skills: [{ skill: "Steward" }],
     salary: 2_000,
     careers: ["merchant/merchant-marine", "merchant/free-trader", "navy/line-crew", "ge-slave/servant"],
@@ -137,6 +153,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "medic",
     name: "Medic",
+    stats: ["EDU", "INT"],
     skills: [{ skill: "Medic" }],
     salary: 4_000,
     careers: ["scholar/physician", "army/support", "marine/support", "ge-warrior/support"],
@@ -145,6 +162,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "administrator",
     name: "Administrator",
+    stats: ["EDU", "SOC"],
     skills: [{ skill: "Admin" }],
     salary: 1_500,
     careers: ["noble/administrator", "citizen/corporate", "merchant/broker", "agent/corporate"],
@@ -153,6 +171,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "officer",
     name: "Officer",
+    stats: ["SOC", "INT"],
     skills: [{ skill: "Leadership" }, { skill: "Persuade" }],
     salary: 5_000,
     careers: ["navy/line-crew", "marine/star-marine", "army/infantry", "ge-fleet-officer/commander", "ge-warrior-officer/leader"],
@@ -161,6 +180,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "marine",
     name: "Marine",
+    stats: ["DEX", "STR", "END"],
     skills: [{ skill: "Gun Combat" }, { skill: "Melee" }],
     salary: 1_000,
     careers: ["marine/star-marine", "marine/ground-assault", "army/infantry", "ge-warrior/imperial-guard", "ge-slave/dog-soldier"],
@@ -170,6 +190,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "scientist",
     name: "Scientist",
+    stats: ["EDU", "INT"],
     skills: [{ skill: "Science" }],
     salary: 0,
     careers: ["scholar/scientist", "scholar/field-researcher", "scout/surveyor"],
@@ -180,6 +201,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "small-craft-crew",
     name: "Small craft crew",
+    stats: ["DEX"],
     skills: [
       { skill: "Pilot", spec: "small craft" },
       { skill: "Gunner", spec: "turret" },
@@ -193,6 +215,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "pilot-astrogator",
     name: "Pilot/Astrogator",
+    stats: ["DEX", "EDU"],
     skills: [{ skill: "Pilot", spec: "spacecraft" }],
     also: [[{ skill: "Astrogation" }]],
     salary: 6_000,
@@ -203,6 +226,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "astrogator-engineer",
     name: "Astrogator/Engineer",
+    stats: ["EDU", "INT"],
     skills: [{ skill: "Astrogation" }],
     also: [
       [
@@ -219,6 +243,7 @@ export const CREW_POSITIONS: CrewPosition[] = [
   {
     id: "captain-pilot",
     name: "Captain/Pilot",
+    stats: ["SOC", "DEX"],
     skills: [{ skill: "Leadership" }, { skill: "Tactics", spec: "naval" }, { skill: "Broker" }, { skill: "Admin" }],
     also: [[{ skill: "Pilot", spec: "spacecraft" }]],
     salary: 10_000,

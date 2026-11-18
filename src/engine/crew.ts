@@ -3,6 +3,7 @@ import { randomAnswerer, type Answerer, type Ask, type AskOption, type Settings 
 import { makeNpc } from "./npc";
 import { findCareer, hasCareer } from "../rules/careers/index";
 import { CREW_POSITIONS, crewSkillText, skillGroups, type CrewPosition, type CrewSkill, type ServiceNeed } from "../rules/crew";
+import { CORE_STATS, type Stat } from "../rules/types";
 
 /**
  * Rolling a ship's crew. CharSpec 12.
@@ -103,6 +104,20 @@ export function crewAnswerer(t: Traveller, random: () => number, p: CrewPosition
     async ask(a: Ask): Promise<number[]> {
       const enabled = a.options.map((o, i) => (o.disabled ? -1 : i)).filter((i) => i >= 0);
       const label = (i: number) => a.options[i]!.label;
+      // Characteristic rolls, assigned one at a time in the book's order (STR to SOC): the best go to the
+      // post's own characteristics (p.stats, most important first), the rest at random. Taking the hint,
+      // the highest roll left, would give STR the best roll every time and SOC the worst.
+      const assign = a.kind === "one" ? /^Assign a roll to (\w+)$/.exec(a.prompt) : null;
+      if (assign && p.stats?.length) {
+        const s = assign[1] as Stat, left = CORE_STATS.slice(CORE_STATS.indexOf(s));
+        const keyLeft = p.stats.filter((k) => left.includes(k));
+        const byValue = enabled.map((i) => ({ i, v: Number(label(i)) })).sort((x, y) => y.v - x.v);
+        // The highest rolls left are kept for the post's characteristics still to come, in their order.
+        const k = keyLeft.indexOf(s);
+        if (k >= 0) return [byValue[k]!.i];
+        const spare = byValue.slice(keyLeft.length).map((x) => x.i);
+        return [randomOf(spare.length ? spare : enabled)];
+      }
       if (a.kind === "one") {
         if (/what next\?$|must try a career/.test(a.prompt)) {
           // A service NPC who has left their service career (ejected, or out at the end of a term)
