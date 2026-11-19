@@ -268,7 +268,10 @@ the Mishap table, the mishap ejects as a survival failure would, and the term
 ends before advancement.
 
 11.5 **Ageing crisis.** The care is always paid, as debt if need be, so the
-Traveller lives; every later qualification fails.
+Traveller lives; every later qualification fails. The crisis also ends the
+current career at the end of that term, Prisoner included (released on
+medical grounds), so a Traveller too frail to win parole is not held for
+ever. Automatic answers then finish the Traveller.
 
 11.6 **Equipment.** Weapons are not split into common and military in the
 Core lists, so Gun and Weapon benefits offer every weapon within the limit.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1, 2026-11-19
+
+- An ageing crisis now ends the career it happens in. A prisoner is released
+  on medical grounds. Before, a prisoner whose characteristics had aged too
+  low to beat the parole threshold could serve forty terms, with a crisis
+  nearly every term. Automatic answers now finish the Traveller after a
+  crisis.
+
 ## 0.4.0, 2026-11-16
 
 - Open a character exported from Foundry VTT's Mongoose Traveller 2e system

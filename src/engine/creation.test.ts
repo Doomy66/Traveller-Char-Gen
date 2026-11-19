@@ -80,3 +80,29 @@ describe("career choices", () => {
     expect(cannotQualify(ctx, findCareer("navy"))).toMatch(/ageing crisis/);
   });
 });
+
+describe("an ageing crisis", () => {
+  /** Characteristics of 2 entered by hand, then sent straight to prison: parole is hard to win. */
+  async function frailPrisoner(seed: number) {
+    const t = { ...emptyTraveller(), name: `P${seed}`, forcedNext: { career: "prisoner" } };
+    const random = randomAnswerer(seededRandom(seed * 7 + 1));
+    const answerer = { ask: (a: Parameters<typeof random.ask>[0]) => (a.kind === "number" && a.prompt.startsWith("Enter") ? Promise.resolve([2]) : random.ask(a)) };
+    const ctx = new Ctx(t, { ...DEFAULT_SETTINGS, statMethod: "manual" }, answerer, seededRandom(seed));
+    await createTraveller(ctx);
+    return ctx.t;
+  }
+
+  it("ends the career it happens in, prison included", async () => {
+    let crises = 0;
+    for (let seed = 1; seed <= 150; seed++) {
+      const t = await frailPrisoner(seed);
+      expect(t.finished, `seed ${seed}`).toBe(true);
+      expect(t.terms, `seed ${seed}`).toBeLessThan(20);
+      if (!t.ageingCrisis) continue;
+      crises++;
+      const i = t.careers.findIndex((r) => r.endReason === "ageing crisis" || r.endReason === "released on medical grounds");
+      expect(i, `seed ${seed}`).toBeGreaterThanOrEqual(0);
+    }
+    expect(crises).toBeGreaterThan(0);
+  }, 60000);
+});

@@ -322,7 +322,7 @@ async function chooseNext(ctx: Ctx, lastLeft: string | undefined, mustCareer = f
   const hint = suited.length > 0 ? suited[hashOf(`${t.name}/${t.terms}/${t.careers.length}`) % suited.length]!.i : -1;
   const plan = await ctx.one(mustCareer ? "Entry failed: you must try a career this term" : `Term ${termNo}: what next?`, opts, {
     always: true,
-    hint: t.terms >= hintTerms(ctx) && !mustCareer ? 0 : Math.max(hint, opts.findIndex((o) => !o.disabled && o.value.kind === "career")),
+    hint: (t.terms >= hintTerms(ctx) || t.ageingCrisis) && !mustCareer ? 0 : Math.max(hint, opts.findIndex((o) => !o.disabled && o.value.kind === "career")),
   });
   if (plan.kind === "career" && plan.career === "draft") return draft(ctx);
   if (plan.kind === "career" && plan.via !== "automatic") return qualifyFor(ctx, plan.career!);
@@ -501,7 +501,7 @@ async function educationTerm(ctx: Ctx, plan: TermPlan): Promise<void> {
       }
     }
   }
-  endTerm(ctx, env);
+  await endTerm(ctx, env);
 }
 
 function currentLevel(ctx: Ctx, name: string, spec?: string): number | undefined {
@@ -515,11 +515,11 @@ function startTerm(ctx: Ctx, what: string): void {
 }
 
 /** Age four years, and from the fourth term roll for ageing. */
-function endTerm(ctx: Ctx, _env: Env): Promise<void> | void {
+function endTerm(ctx: Ctx, env: Env): Promise<void> | void {
   const t = ctx.t;
   t.age += 4;
   ctx.onChange();
-  if (t.terms >= AGEING_FROM_TERM) return ageing(ctx);
+  if (t.terms >= AGEING_FROM_TERM) return ageingRoll(ctx, "Ageing", env);
 }
 
 /** Every skill on a basic training table at level 0 (CRB p18). Characteristic rows are skipped. */
@@ -603,7 +603,7 @@ async function careerTerm(ctx: Ctx, plan: TermPlan): Promise<string | undefined>
 
   // Anagathics (CRB p49), not in prison.
   if (career.id !== "prisoner") {
-    const toPrison = await anagathics(ctx);
+    const toPrison = await anagathics(ctx, env);
     if (toPrison) {
       if (firstTerm && rec.terms === 0) t.careers.pop();
       else {
@@ -616,7 +616,7 @@ async function careerTerm(ctx: Ctx, plan: TermPlan): Promise<string | undefined>
   } else if (t.anagathics.active) {
     t.anagathics.active = false;
     ctx.log("No anagathics in prison: the supply stops.", "warn");
-    await ageingRoll(ctx, "Stopping anagathics");
+    await ageingRoll(ctx, "Stopping anagathics", env);
   }
 
   // Prisoners pick a new assignment every term (CRB p52); some events force one.
@@ -694,6 +694,16 @@ async function careerTerm(ctx: Ctx, plan: TermPlan): Promise<string | undefined>
   if (t.dead) {
     rec.ended = true;
     rec.endReason = "died";
+    return career.id;
+  }
+  // An ageing crisis ends the career, prison included (CharSpec 11.5).
+  if (env.term.crisis) {
+    const prison = career.id === "prisoner";
+    rec.endReason = prison ? "released on medical grounds" : "ageing crisis";
+    ctx.log(prison ? "The ageing crisis gets you released on medical grounds." : `The ageing crisis ends your time in the ${career.name}.`, "career");
+    await musterOut(ctx, rec);
+    t.forcedNext = undefined;
+    t.returnTo = undefined;
     return career.id;
   }
   return decideNext(ctx, env);
@@ -867,14 +877,14 @@ async function decideNext(ctx: Ctx, env: Env): Promise<string | undefined> {
 // ---------------------------------------------------------------- ageing and anagathics
 
 /** Returns true if obtaining anagathics sends the Traveller to prison this term. */
-async function anagathics(ctx: Ctx): Promise<boolean> {
+async function anagathics(ctx: Ctx, env: Env): Promise<boolean> {
   const t = ctx.t;
   if (t.anagathics.active) {
     const keep = await ctx.yes(`Continue anagathics this term? (1D x ${fmt(ANAGATHICS.costPerDie)}, two survival rolls)`, { hint: true });
     if (!keep) {
       t.anagathics.active = false;
       ctx.log("You stop taking anagathics.", "info");
-      await ageingRoll(ctx, "Stopping anagathics");
+      await ageingRoll(ctx, "Stopping anagathics", env);
       return false;
     }
   } else {
@@ -897,11 +907,8 @@ async function anagathics(ctx: Ctx): Promise<boolean> {
   return false;
 }
 
-async function ageing(ctx: Ctx): Promise<void> {
-  await ageingRoll(ctx, "Ageing");
-}
-
-async function ageingRoll(ctx: Ctx, label: string): Promise<void> {
+/** Roll for ageing. A crisis is marked on the term, which then ends the career. */
+async function ageingRoll(ctx: Ctx, label: string, env: Env): Promise<void> {
   const t = ctx.t;
   const r = (await ctx.roll("2D", label)).total;
   const dmAge = -t.terms + (t.anagathics.active ? t.anagathics.terms : 0);
@@ -929,6 +936,7 @@ async function ageingRoll(ctx: Ctx, label: string): Promise<void> {
     t.debt += cost;
     for (const s of zero) t.stats[s] = 1;
     t.ageingCrisis = true;
+    env.term.crisis = true;
     ctx.log(`Ageing crisis: medical care costs ${fmt(cost)} and brings ${zero.join(", ")} back to 1. Every qualification roll fails from now on.`, "warn");
   }
   ctx.onChange();

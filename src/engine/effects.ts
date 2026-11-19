@@ -47,6 +47,8 @@ export interface TermState {
   mishap: boolean;
   /** Skills raised this term (for the pre-career tutor event). */
   skillsGained: string[];
+  /** An ageing crisis this term: the career ends with it (CharSpec 11.5). */
+  crisis?: boolean;
 }
 
 export function newTermState(): TermState {
